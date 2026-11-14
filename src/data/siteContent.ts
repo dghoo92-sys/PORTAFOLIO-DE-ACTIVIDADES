@@ -23,6 +23,7 @@ import eduAiGammaImg from '../assets/images/edu_ai_gamma_1794610151650.jpg';
 import eduAiPerplexityImg from '../assets/images/edu_ai_perplexity_1794610153069.jpg';
 import eduAiNotebooklmImg from '../assets/images/edu_ai_notebooklm_1794610153374.jpg';
 import rutaIaFuturisticaImg from '../assets/images/ruta_ia_futuristica_savia_1794610340669.jpg';
+import gammaDeclaracionIaImg from '../assets/images/gamma_declaracion_ia_1794618096696.jpg';
 
 export const IMAGES = {
   heroTeacher: heroTeacherImg,
@@ -50,6 +51,7 @@ export const IMAGES = {
   eduAiPerplexity: eduAiPerplexityImg,
   eduAiNotebooklm: eduAiNotebooklmImg,
   rutaIntegracion: rutaIaFuturisticaImg,
+  gammaDeclaracionPreview: gammaDeclaracionIaImg,
 };
 
 export const UDIFY_AGENT_URL = 'https://udify.app/agent/KH1A0kd7SiOVb6kW';
@@ -133,6 +135,8 @@ export interface EthicsActivity {
   description: string;
   url: string;
   embedUrl: string;
+  previewImage?: string;
+  previewImageAlt?: string;
   toolLinks?: EthicsActivityToolLink[];
 }
 
@@ -156,6 +160,8 @@ export const ETHICS_ACTIVITIES: EthicsActivity[] = [
       'Da clic en la imagen o en el botón para dirigirte a la presentación realizada en Gamma; sigue el paso a paso para desarrollar las actividades y dirigirte a las herramientas que esta incluye dentro de sí (Genially, Mentimeter, Ideamap, creación de prompts en PromptCowboy.ai y Padlet).',
     url: 'https://gamma.app/docs/Actividad-4-Elaborar-una-declaracion-de-uso-de-IA-a1fld3bqzvdyv8y',
     embedUrl: 'https://gamma.app/embed/a1fld3bqzvdyv8y',
+    previewImage: gammaDeclaracionIaImg,
+    previewImageAlt: 'Vista previa de la presentación en Gamma: Actividad 4 — Elaborar una declaración de uso de IA',
     toolLinks: [
       {
         step: 1,

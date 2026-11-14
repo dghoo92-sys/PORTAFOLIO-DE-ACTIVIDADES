@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ArrowRight,
   BookOpen,
+  Bot,
   Check,
   ExternalLink,
   FileText,
@@ -180,14 +181,113 @@ export default function App() {
             accentColor="#3E3028"
           />
 
-          <div className="relative z-10 max-w-[1040px] mx-auto px-5 sm:px-8 text-center space-y-5">
-            <p className="relative inline-block pb-2 font-serif text-xl sm:text-2xl font-bold italic uppercase tracking-wide text-[#F57923]">
-              Introducción de la actividad
-              <HandDrawnUnderline className="absolute bottom-0 left-0 w-full h-3" />
-            </p>
-            <h2 className="font-serif text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.12] text-[#3E3028]">
-              La inteligencia artificial en la docencia
-            </h2>
+          <div className="relative z-10 max-w-[1140px] mx-auto px-5 sm:px-8 space-y-14">
+            {/* PANTALLA FUTURISTA DE BIENVENIDA */}
+            <motion.div
+              initial={prefersReduced ? false : { opacity: 0, y: 20, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="relative rounded-[2.25rem] p-[2px] bg-gradient-to-r from-[#F57923] via-[#EC4899] via-[#8B5CF6] to-[#06B6D4] shadow-2xl shadow-[#3E3028]/20"
+            >
+              <div className="relative overflow-hidden rounded-[2.15rem] bg-gradient-to-br from-[#161124] via-[#221738] to-[#131C31] px-6 py-10 sm:px-12 sm:py-14 text-center">
+                {/* Fondo cuadriculado futurista y destellos de color */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 opacity-20"
+                  style={{
+                    backgroundImage:
+                      'linear-gradient(to right, rgba(56, 189, 248, 0.28) 1px, transparent 1px), linear-gradient(to bottom, rgba(245, 121, 35, 0.25) 1px, transparent 1px)',
+                    backgroundSize: '42px 42px',
+                  }}
+                />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -top-24 -left-16 w-72 h-72 rounded-full bg-[#F57923]/30 blur-3xl"
+                />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -bottom-24 -right-12 w-80 h-80 rounded-full bg-[#06B6D4]/25 blur-3xl"
+                />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-44 rounded-full bg-[#EC4899]/20 blur-3xl"
+                />
+
+                {/* Esquinas luminosas tipo visor futurista */}
+                <span aria-hidden="true" className="pointer-events-none absolute top-5 left-5 w-6 h-6 border-t-2 border-l-2 border-[#22D3EE]/75 rounded-tl-lg" />
+                <span aria-hidden="true" className="pointer-events-none absolute top-5 right-5 w-6 h-6 border-t-2 border-r-2 border-[#F57923]/80 rounded-tr-lg" />
+                <span aria-hidden="true" className="pointer-events-none absolute bottom-5 left-5 w-6 h-6 border-b-2 border-l-2 border-[#F472B6]/75 rounded-bl-lg" />
+                <span aria-hidden="true" className="pointer-events-none absolute bottom-5 right-5 w-6 h-6 border-b-2 border-r-2 border-[#A78BFA]/75 rounded-br-lg" />
+
+                <div className="relative z-10 max-w-4xl mx-auto space-y-6">
+                  {/* Barra superior decorativa de pantalla */}
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-[#FDE68A]">
+                      <Sparkles className="w-4 h-4 text-[#22D3EE]" />
+                      Portafolio Digital Interactivo
+                    </span>
+                  </div>
+
+                  <h1 className="font-serif text-[clamp(2.2rem,5vw,4.05rem)] font-extrabold leading-[1.08] tracking-tight">
+                    <span className="block text-[#FAF7F0] drop-shadow-[0_2px_18px_rgba(255,255,255,0.18)]">
+                      ¡Bienvenidos al aula del futuro
+                    </span>
+                    <span className="block mt-1 bg-gradient-to-r from-[#FF8A3D] via-[#FF5E99] via-[#C084FC] to-[#22D3EE] bg-clip-text text-transparent drop-shadow-[0_4px_24px_rgba(236,72,153,0.28)]">
+                      con Inteligencia Artificial!
+                    </span>
+                  </h1>
+
+                  <p className="text-base sm:text-lg text-[#EDE9FE]/90 leading-relaxed max-w-[66ch] mx-auto">
+                    Descubre una experiencia interactiva donde la pedagogía humana y la tecnología avanzada se unen en cuatro etapas vivas: diagnóstico, co-creación, ética y herramientas de IA para potenciar el aprendizaje.
+                  </p>
+
+                  {/* Módulos de colores estilo pantalla */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-3xl mx-auto pt-1">
+                    {[
+                      { label: '01 · Diagnóstico', href: '#diagnostico', border: 'border-[#F57923]/55 hover:bg-[#F57923]/20 text-[#FDBA74]' },
+                      { label: '02 · Co-creación', href: '#co-creacion', border: 'border-[#EC4899]/55 hover:bg-[#EC4899]/20 text-[#F9A8D4]' },
+                      { label: '03 · Ética IA', href: '#etica', border: 'border-[#A855F7]/55 hover:bg-[#A855F7]/20 text-[#D8B4FE]' },
+                      { label: '04 · Herramientas', href: '#agente-ia', border: 'border-[#06B6D4]/55 hover:bg-[#06B6D4]/20 text-[#67E8F9]' },
+                    ].map((chip) => (
+                      <a
+                        key={chip.label}
+                        href={chip.href}
+                        className={`rounded-2xl bg-white/6 backdrop-blur-xs border ${chip.border} px-3 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5`}
+                      >
+                        {chip.label}
+                      </a>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+                    <a
+                      href="#intro-contenido"
+                      className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] hover:brightness-110 text-white font-bold text-sm sm:text-base px-7 py-3.5 shadow-lg shadow-[#EC4899]/30 transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
+                    >
+                      <span>Explorar introducción</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+                    <a
+                      href="#contacto"
+                      className="inline-flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/18 text-[#FAF7F0] border border-[#22D3EE]/45 font-semibold text-sm sm:text-base px-6 py-3.5 backdrop-blur-xs transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
+                    >
+                      <Bot className="w-4 h-4 text-[#22D3EE]" />
+                      <span>Ir al Agente virtual</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* INTRODUCCIÓN DE LA ACTIVIDAD */}
+            <div id="intro-contenido" className="max-w-[1040px] mx-auto text-center space-y-5 scroll-mt-24">
+              <p className="relative inline-block pb-2 font-serif text-xl sm:text-2xl font-bold italic uppercase tracking-wide text-[#F57923]">
+                Introducción de la actividad
+                <HandDrawnUnderline className="absolute bottom-0 left-0 w-full h-3" />
+              </p>
+              <h2 className="font-serif text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.12] text-[#3E3028]">
+                La inteligencia artificial en la docencia
+              </h2>
             <p className="text-base sm:text-lg text-[#6C584C] leading-relaxed max-w-[74ch] mx-auto">
               Esta ruta guía la integración de la inteligencia artificial en la práctica docente a través de cuatro etapas fundamentadas: inicia con un diagnóstico inicial para identificar las necesidades y brechas tecnológicas del cuerpo docente mediante el análisis cuantitativo y cualitativo de encuestas; continúa con laboratorios de cocreación didáctica orientados al diseño práctico de recursos visuales y juegos educativos con herramientas como Canva IA y Wordwall; incorpora un análisis ético y código de conducta centrado en la evaluación de casos reales sobre privacidad y plagio para construir acuerdos institucionales claros; y finaliza con la exploración de agentes multimodales y la declaración final, consolidando un marco institucional colaborativo para el uso responsable y formalizado de IA.
             </p>
@@ -231,6 +331,7 @@ export default function App() {
                   />
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </section>
@@ -1744,29 +1845,64 @@ export default function App() {
                       <div className="lg:col-span-7 rounded-2xl bg-[#FAF7F0] border border-[#3E3028]/12 p-3 sm:p-4 shadow-xs space-y-2.5">
                         <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-[#3E3028]/10">
                           <span className="text-xs font-semibold text-[#F57923]">
-                            {isGamma
-                              ? 'Presentación Gamma · Explora sin salir de la página'
-                              : 'Genially interactivo · Explora sin salir de la página'}
+                            {activity.previewImage
+                              ? 'Presentación Gamma · Haz clic en la imagen para abrir'
+                              : isGamma
+                                ? 'Presentación Gamma · Explora sin salir de la página'
+                                : 'Genially interactivo · Explora sin salir de la página'}
                           </span>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedActivity(activity)}
-                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#3E3028] hover:text-[#F57923] transition-colors cursor-pointer"
+                          {activity.previewImage ? (
+                            <a
+                              href={activity.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#3E3028] hover:text-[#F57923] transition-colors"
+                            >
+                              Abrir en Gamma
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedActivity(activity)}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#3E3028] hover:text-[#F57923] transition-colors cursor-pointer"
+                            >
+                              <Maximize2 className="w-3 h-3" />
+                              Pantalla ampliada
+                            </button>
+                          )}
+                        </div>
+                        {activity.previewImage ? (
+                          <a
+                            href={activity.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Abrir presentación de Gamma: ${activity.title}`}
+                            className="group/img relative block overflow-hidden rounded-xl border border-[#3E3028]/10 bg-[#FFF0DE] aspect-video focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F57923]"
                           >
-                            <Maximize2 className="w-3 h-3" />
-                            Pantalla ampliada
-                          </button>
-                        </div>
-                        <div className="overflow-hidden rounded-xl border border-[#3E3028]/10 bg-[#FFF0DE] aspect-video">
-                          <iframe
-                            src={activity.embedUrl}
-                            title={activity.title}
-                            allow="fullscreen"
-                            allowFullScreen
-                            loading="lazy"
-                            className="w-full h-full border-0"
-                          />
-                        </div>
+                            <ResilientImage
+                              src={activity.previewImage}
+                              alt={activity.previewImageAlt ?? activity.title}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-[1.02]"
+                              containerClassName="w-full h-full"
+                            />
+                            <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-[#F57923] group-hover/img:bg-[#DF6613] text-[#FAF7F0] text-xs font-semibold px-3.5 py-1.5 shadow-md transition-colors">
+                              Explorar en Gamma
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </span>
+                          </a>
+                        ) : (
+                          <div className="overflow-hidden rounded-xl border border-[#3E3028]/10 bg-[#FFF0DE] aspect-video">
+                            <iframe
+                              src={activity.embedUrl}
+                              title={activity.title}
+                              allow="fullscreen"
+                              allowFullScreen
+                              loading="lazy"
+                              className="w-full h-full border-0"
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
 
