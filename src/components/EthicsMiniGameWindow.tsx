@@ -32,12 +32,55 @@ interface GameScenario {
   options: GameOption[];
 }
 
-const PILLAR_TABS: { key: EthicsPillarKey; label: string }[] = [
-  { key: 'todos', label: 'Todos (6)' },
-  { key: 'autoria', label: 'Autoría y voz' },
-  { key: 'privacidad', label: 'Privacidad' },
-  { key: 'verificacion', label: 'Verificación' },
-  { key: 'acuerdos', label: 'Acuerdos' },
+const PILLAR_TABS: {
+  key: EthicsPillarKey;
+  label: string;
+  activeClass: string;
+  idleClass: string;
+}[] = [
+  {
+    key: 'todos',
+    label: 'Todos (6)',
+    activeClass: 'bg-[#4A3F39] text-[#FAF7F0] border-[#3E3028] shadow-2xs',
+    idleClass: 'bg-[#F3ECE4] text-[#5C4D44] border-[#E2D6C8] hover:bg-[#EAE0D3]',
+  },
+  {
+    key: 'autoria',
+    label: 'Autoría y voz',
+    activeClass: 'bg-[#6E5A82] text-[#FAF7F0] border-[#584769] shadow-2xs',
+    idleClass: 'bg-[#F3EFF7] text-[#584769] border-[#DFD6E8] hover:bg-[#EAE3F2]',
+  },
+  {
+    key: 'privacidad',
+    label: 'Privacidad',
+    activeClass: 'bg-[#3E7A74] text-[#FAF7F0] border-[#2E5F5A] shadow-2xs',
+    idleClass: 'bg-[#ECF5F3] text-[#2E5F5A] border-[#CCE2DE] hover:bg-[#E0EEEC]',
+  },
+  {
+    key: 'verificacion',
+    label: 'Verificación',
+    activeClass: 'bg-[#497594] text-[#FAF7F0] border-[#385C75] shadow-2xs',
+    idleClass: 'bg-[#EDF3F7] text-[#385C75] border-[#CEDEE8] hover:bg-[#E2ECF2]',
+  },
+  {
+    key: 'acuerdos',
+    label: 'Acuerdos',
+    activeClass: 'bg-[#B86A3B] text-[#FAF7F0] border-[#96532B] shadow-2xs',
+    idleClass: 'bg-[#FAF0E6] text-[#8A4E29] border-[#EBD6C2] hover:bg-[#F3E2D1]',
+  },
+];
+
+const PILLAR_BADGE_STYLES: Record<Exclude<EthicsPillarKey, 'todos'>, string> = {
+  autoria: 'bg-[#6E5A82] text-[#FAF7F0]',
+  privacidad: 'bg-[#3E7A74] text-[#FAF7F0]',
+  verificacion: 'bg-[#497594] text-[#FAF7F0]',
+  acuerdos: 'bg-[#B86A3B] text-[#FAF7F0]',
+};
+
+const OPTION_LETTER_COLORS = [
+  'bg-[#6B8BA4] text-[#FAF7F0] border-[#58748A]',
+  'bg-[#8A759E] text-[#FAF7F0] border-[#725F85]',
+  'bg-[#C87D4B] text-[#FAF7F0] border-[#A8653A]',
 ];
 
 const GAME_SCENARIOS: GameScenario[] = [
@@ -299,7 +342,7 @@ function EthicsGameContent({
 
   return (
     <div className="space-y-4">
-      {/* Filtros por pilar */}
+      {/* Filtros por pilar tipo selector de modo de juego */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Filtrar casos por pilar">
           {PILLAR_TABS.map((tab) => (
@@ -309,10 +352,8 @@ function EthicsGameContent({
               role="tab"
               aria-selected={selectedPillar === tab.key}
               onClick={() => handleFilterChange(tab.key)}
-              className={`rounded-full px-3 py-1 text-[11px] font-semibold transition-colors cursor-pointer ${
-                selectedPillar === tab.key
-                  ? 'bg-[#3E3028] text-[#FAF7F0]'
-                  : 'bg-[#FFF0DE] text-[#6C584C] hover:text-[#3E3028] hover:bg-[#F7C99D]/55'
+              className={`rounded-xl border border-b-2 px-3 py-1 text-[11px] font-bold transition-all cursor-pointer ${
+                selectedPillar === tab.key ? tab.activeClass : tab.idleClass
               }`}
             >
               {tab.label}
@@ -320,30 +361,34 @@ function EthicsGameContent({
           ))}
         </div>
 
-        <div className="inline-flex items-center gap-2 text-xs font-semibold text-[#3E3028] tabular-nums">
-          <span className="rounded-full bg-[#FFF0DE] border border-[#F7C99D] px-3 py-1">
-            Aciertos: <strong className="text-[#F57923]">{correctCount}</strong> / {scenarios.length}
+        <div className="inline-flex items-center gap-2 text-xs font-bold text-[#4B3B32] tabular-nums">
+          <span className="rounded-xl bg-[#F6EBDC] border border-[#E5CFAF] px-3 py-1">
+            Aciertos: <strong className="text-[#2E6F52]">{correctCount}</strong> / {scenarios.length}
           </span>
         </div>
       </div>
 
-      {/* Barra de progreso */}
-      <div className="h-1.5 w-full rounded-full bg-[#FFF0DE] overflow-hidden">
+      {/* Barra de progreso suave */}
+      <div className="h-2 w-full rounded-full bg-[#EFE6DA] border border-[#E2D6C8] overflow-hidden">
         <div
-          className="h-full rounded-full bg-[#F57923] transition-all duration-300"
+          className="h-full rounded-full bg-gradient-to-r from-[#D98245] to-[#C86D3B] transition-all duration-300"
           style={{ width: `${progressPct}%` }}
         />
       </div>
 
       {!finished && currentScenario ? (
         <div className="space-y-3.5">
-          <div className="rounded-2xl bg-[#FFF0DE]/70 border border-[#F7C99D] p-4 space-y-1.5">
+          <div className="rounded-2xl bg-[#FFF8EE]/90 border border-[#E8D2B5] p-4 space-y-2 shadow-2xs">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#F57923]">
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
+                  PILLAR_BADGE_STYLES[currentScenario.pillar]
+                }`}
+              >
                 <ShieldCheck className="w-3.5 h-3.5" />
                 {currentScenario.pillarLabel}
               </span>
-              <span className="text-[11px] font-semibold text-[#6C584C] tabular-nums">
+              <span className="rounded-lg bg-[#EFE6DA] text-[#5C4D44] px-2.5 py-0.5 text-[11px] font-semibold tabular-nums">
                 {currentScenario.badgeTag} · {safeIndex + 1} de {scenarios.length}
               </span>
             </div>
@@ -352,20 +397,24 @@ function EthicsGameContent({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-1 gap-2.5">
             {currentScenario.options.map((option, idx) => {
               const isSelected = chosenOptionId === option.id;
               const showOutcome = Boolean(chosenOptionId);
               let cardStyle =
-                'bg-white hover:bg-[#FFF0DE]/65 border-[#3E3028]/12 hover:border-[#F57923]/60 text-[#3E3028]';
+                'bg-white hover:bg-[#FAF2E8] border border-b-2 border-[#DDD0C0] hover:border-[#C98A5B] text-[#3E3028]';
+              let badgeStyle = OPTION_LETTER_COLORS[idx % OPTION_LETTER_COLORS.length];
 
               if (showOutcome) {
                 if (option.isCorrect) {
-                  cardStyle = 'bg-emerald-50 border-emerald-500 text-[#3E3028]';
+                  cardStyle = 'bg-[#EDF6F0] border border-b-2 border-[#6BA884] text-[#234834]';
+                  badgeStyle = 'bg-[#4C8F69] text-white border-[#3B7554]';
                 } else if (isSelected && !option.isCorrect) {
-                  cardStyle = 'bg-rose-50 border-rose-400 text-[#3E3028]';
+                  cardStyle = 'bg-[#FBF0F0] border border-b-2 border-[#CF7C82] text-[#5E2A2E]';
+                  badgeStyle = 'bg-[#BA6168] text-white border-[#9B4C52]';
                 } else {
-                  cardStyle = 'bg-white/60 border-[#3E3028]/10 text-[#6C584C] opacity-75';
+                  cardStyle = 'bg-white/75 border border-[#E5DDD2] text-[#7A6B61] opacity-75';
+                  badgeStyle = 'bg-[#D6CCC0] text-[#5C4D44] border-[#C2B6A8]';
                 }
               }
 
@@ -375,19 +424,21 @@ function EthicsGameContent({
                   type="button"
                   disabled={showOutcome}
                   onClick={() => handleChooseOption(option)}
-                  className={`w-full text-left rounded-xl border px-3.5 py-2.5 transition-all flex items-start gap-2.5 ${
-                    showOutcome ? 'cursor-default' : 'cursor-pointer'
+                  className={`w-full text-left rounded-xl px-3.5 py-2.5 transition-all flex items-start gap-2.5 ${
+                    showOutcome ? 'cursor-default' : 'cursor-pointer active:translate-y-[1px]'
                   } ${cardStyle}`}
                 >
-                  <span className="w-5 h-5 rounded-full bg-[#FFF0DE] border border-[#F7C99D] text-[11px] font-bold text-[#3E3028] flex items-center justify-center shrink-0 mt-0.5 uppercase">
+                  <span
+                    className={`w-6 h-6 rounded-lg border text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5 uppercase ${badgeStyle}`}
+                  >
                     {String.fromCharCode(65 + idx)}
                   </span>
-                  <span className="text-xs sm:text-sm leading-snug flex-1">{option.label}</span>
+                  <span className="text-xs sm:text-sm font-medium leading-snug flex-1">{option.label}</span>
                   {showOutcome && option.isCorrect && (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-[#3B7554] shrink-0 mt-0.5" />
                   )}
                   {showOutcome && isSelected && !option.isCorrect && (
-                    <XCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                    <XCircle className="w-4 h-4 text-[#BA6168] shrink-0 mt-0.5" />
                   )}
                 </button>
               );
@@ -398,12 +449,12 @@ function EthicsGameContent({
             <div
               className={`rounded-xl border p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                 chosenOption.isCorrect
-                  ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950'
-                  : 'bg-amber-50/90 border-[#F7C99D] text-[#3E3028]'
+                  ? 'bg-[#EDF6F0] border-[#82B898] text-[#234834]'
+                  : 'bg-[#FDF4E7] border-[#E0BE93] text-[#5C3D24]'
               }`}
             >
               <p className="text-xs sm:text-sm leading-relaxed">
-                <strong className="font-semibold">
+                <strong className="font-bold">
                   {chosenOption.isCorrect ? 'Criterio ético logrado: ' : 'Reflexión para el aula: '}
                 </strong>
                 {chosenOption.feedback}
@@ -411,7 +462,7 @@ function EthicsGameContent({
               <button
                 type="button"
                 onClick={handleNext}
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#F57923] hover:bg-[#DF6613] text-[#FAF7F0] text-xs font-semibold px-4 py-2 whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#D97236] hover:bg-[#C26129] text-[#FAF7F0] border-b-2 border-[#9E4D1F]/45 text-xs font-bold px-4 py-2 whitespace-nowrap shrink-0 transition-all cursor-pointer shadow-2xs"
               >
                 {safeIndex + 1 < scenarios.length ? 'Siguiente caso' : 'Ver resultado'}
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -420,12 +471,12 @@ function EthicsGameContent({
           )}
         </div>
       ) : (
-        <div className="rounded-2xl bg-[#FFF0DE] border border-[#F7C99D] p-5 text-center space-y-3">
-          <div className="w-11 h-11 rounded-full bg-[#F57923] text-[#FAF7F0] flex items-center justify-center mx-auto">
-            <Award className="w-5 h-5" />
+        <div className="rounded-2xl bg-gradient-to-br from-[#FAF3E6] via-[#FCF8F2] to-[#F7ECE3] border border-[#E3C6A4] p-5 text-center space-y-3 shadow-2xs">
+          <div className="w-12 h-12 rounded-2xl bg-[#D97236] text-[#FAF7F0] flex items-center justify-center mx-auto shadow-xs border border-white/80">
+            <Award className="w-6 h-6" />
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#F57923]">
+            <p className="inline-block rounded-full bg-[#6E5A82] text-[#FAF7F0] px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider">
               Reto completado
             </p>
             <h4 className="font-serif text-xl font-bold text-[#3E3028]">
@@ -435,7 +486,7 @@ function EthicsGameContent({
                 ? 'Insignia: Constructor de Acuerdos'
                 : 'Insignia: Explorador de Ética en IA'}
             </h4>
-            <p className="text-xs sm:text-sm text-[#6C584C] max-w-lg mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#6C584C] max-w-lg mx-auto leading-relaxed font-medium">
               Resolviste correctamente {correctCount} de {scenarios.length} situaciones prácticas sobre autoría, privacidad escolar, verificación crítica y acuerdos visibles en el aula.
             </p>
           </div>
@@ -443,7 +494,7 @@ function EthicsGameContent({
             <button
               type="button"
               onClick={handleRestart}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#F57923] hover:bg-[#DF6613] text-[#FAF7F0] text-xs font-semibold px-5 py-2 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#4A3F39] hover:bg-[#3E3028] text-[#FAF7F0] border-b-2 border-[#2B221D] text-xs font-bold px-5 py-2 transition-all cursor-pointer shadow-2xs"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Volver a jugar
@@ -452,9 +503,9 @@ function EthicsGameContent({
               <button
                 type="button"
                 onClick={() => handleFilterChange('todos')}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#FAF7F0] hover:bg-[#F7C99D]/55 text-[#3E3028] border border-[#3E3028]/12 text-xs font-semibold px-4 py-2 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-white hover:bg-[#FAF0E6] text-[#4A3F39] border border-b-2 border-[#D6C5B3] text-xs font-bold px-4 py-2 transition-all cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#F57923]" />
+                <Sparkles className="w-3.5 h-3.5 text-[#D97236]" />
                 Jugar los 6 casos
               </button>
             )}
@@ -473,19 +524,19 @@ export function EthicsMiniGameWindow() {
 
   return (
     <>
-      {/* Pequeña ventana integrada en el apartado de los 4 pilares */}
-      <div className="mt-7 max-w-4xl mx-auto rounded-2xl bg-[#FAF7F0] border border-[#3E3028]/15 shadow-sm overflow-hidden">
-        {/* Barra superior estilo pequeña ventana */}
-        <div className="bg-[#FFF0DE] border-b border-[#F7C99D] px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      {/* Pequeña ventana integrada en el apartado de los 4 pilares con estética tipo juego */}
+      <div className="mt-7 max-w-4xl mx-auto rounded-2xl bg-gradient-to-br from-[#EEF2FF] via-[#FFFDF9] to-[#FEF3C7]/60 border-2 border-[#6366F1]/55 shadow-lg shadow-[#6366F1]/15 overflow-hidden">
+        {/* Barra superior estilo consola/juego */}
+        <div className="bg-gradient-to-r from-[#4F46E5] via-[#7C3AED] to-[#EC4899] px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-white">
           <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-1" aria-hidden="true">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#F57923]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#F6B36A]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#3E3028]/25" />
+            <div className="flex items-center gap-1.5" aria-hidden="true">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FACC15] shadow-xs" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] shadow-xs" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#FB7185] shadow-xs" />
             </div>
             <div className="flex items-center gap-1.5">
-              <Gamepad2 className="w-4 h-4 text-[#F57923]" />
-              <span className="text-xs sm:text-sm font-serif font-bold text-[#3E3028]">
+              <Gamepad2 className="w-4 h-4 text-[#FDE047]" />
+              <span className="text-xs sm:text-sm font-serif font-bold text-white drop-shadow-xs">
                 Mini-juego · Decisiones Éticas en el Aula
               </span>
             </div>
@@ -496,7 +547,7 @@ export function EthicsMiniGameWindow() {
               type="button"
               onClick={() => setIsMinimized((m) => !m)}
               aria-label={isMinimized ? 'Expandir pequeña ventana del juego' : 'Minimizar pequeña ventana del juego'}
-              className="inline-flex items-center gap-1 rounded-full bg-[#FAF7F0] hover:bg-[#F7C99D]/50 text-[#3E3028] border border-[#3E3028]/12 text-[11px] font-semibold px-2.5 py-1 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/25 text-[11px] font-bold px-2.5 py-1 transition-colors cursor-pointer"
             >
               {isMinimized ? <Maximize2 className="w-3 h-3" /> : <Minimize2 className="w-3 h-3" />}
               <span>{isMinimized ? 'Mostrar juego' : 'Minimizar'}</span>
@@ -504,7 +555,7 @@ export function EthicsMiniGameWindow() {
             <button
               type="button"
               onClick={() => setIsExpandedWindow(true)}
-              className="inline-flex items-center gap-1 rounded-full bg-[#F57923] hover:bg-[#DF6613] text-[#FAF7F0] text-[11px] font-semibold px-3 py-1 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-xl bg-[#FACC15] hover:bg-[#FDE047] text-[#312E81] border-b-2 border-[#CA8A04] text-[11px] font-extrabold px-3 py-1 transition-colors cursor-pointer shadow-xs"
             >
               <Maximize2 className="w-3 h-3" />
               <span>Abrir ventana</span>
@@ -513,7 +564,7 @@ export function EthicsMiniGameWindow() {
         </div>
 
         {!isMinimized && (
-          <div className="p-4 sm:p-5">
+          <div className="p-4 sm:p-5 bg-[#FCF9F3]">
             <EthicsGameContent
               compact
               selectedPillar={selectedPillar}
@@ -538,24 +589,24 @@ export function EthicsMiniGameWindow() {
               exit={{ opacity: 0 }}
               transition={{ duration: prefersReduced ? 0 : 0.2 }}
               onClick={() => setIsExpandedWindow(false)}
-              className="fixed inset-0 bg-[#3E3028]/55 backdrop-blur-xs"
+              className="fixed inset-0 bg-[#1E1B4B]/60 backdrop-blur-xs"
             />
             <motion.div
               initial={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={prefersReduced ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
               transition={{ duration: prefersReduced ? 0 : 0.22 }}
-              className="relative w-full max-w-2xl bg-[#FAF7F0] rounded-3xl border border-[#3E3028]/15 shadow-2xl overflow-hidden my-auto"
+              className="relative w-full max-w-2xl bg-gradient-to-br from-[#EEF2FF] via-[#FFFDF9] to-[#FEF3C7]/60 rounded-3xl border-2 border-[#6366F1]/60 shadow-2xl overflow-hidden my-auto"
             >
-              <div className="bg-[#FFF0DE] border-b border-[#F7C99D] px-5 py-3.5 flex items-center justify-between gap-3">
+              <div className="bg-gradient-to-r from-[#4F46E5] via-[#7C3AED] to-[#EC4899] px-5 py-3.5 flex items-center justify-between gap-3 text-white">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex items-center gap-1" aria-hidden="true">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#F57923]" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#F6B36A]" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#3E3028]/25" />
+                  <div className="flex items-center gap-1.5" aria-hidden="true">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FACC15]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#34D399]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FB7185]" />
                   </div>
-                  <Gamepad2 className="w-4 h-4 text-[#F57923]" />
-                  <h3 id="ethics-game-modal-title" className="font-serif text-base sm:text-lg font-bold text-[#3E3028]">
+                  <Gamepad2 className="w-4 h-4 text-[#FDE047]" />
+                  <h3 id="ethics-game-modal-title" className="font-serif text-base sm:text-lg font-bold text-white drop-shadow-xs">
                     Mini-juego · Decisiones Éticas en el Aula
                   </h3>
                 </div>
@@ -563,12 +614,12 @@ export function EthicsMiniGameWindow() {
                   type="button"
                   onClick={() => setIsExpandedWindow(false)}
                   aria-label="Cerrar ventana del juego"
-                  className="w-8 h-8 rounded-full bg-[#FAF7F0] hover:bg-[#F7C99D]/60 text-[#3E3028] flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/30 text-white border border-white/25 flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="p-5 sm:p-6">
+              <div className="p-5 sm:p-6 bg-[#FCF9F3]">
                 <EthicsGameContent
                   selectedPillar={selectedPillar}
                   onSelectPillar={setSelectedPillar}

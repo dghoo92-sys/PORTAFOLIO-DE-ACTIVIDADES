@@ -24,6 +24,8 @@ import eduAiPerplexityImg from '../assets/images/edu_ai_perplexity_1794610153069
 import eduAiNotebooklmImg from '../assets/images/edu_ai_notebooklm_1794610153374.jpg';
 import rutaIaFuturisticaImg from '../assets/images/ruta_ia_futuristica_savia_1794610340669.jpg';
 import gammaDeclaracionIaImg from '../assets/images/gamma_declaracion_ia_1794618096696.jpg';
+import labCocreacionNaturalImg from '../assets/images/lab_cocreacion_natural_1794669530676.jpg';
+import rutaIaColoresPaginaImg from '../assets/images/ruta_ia_colores_pagina_1794669690736.jpg';
 
 export const IMAGES = {
   heroTeacher: heroTeacherImg,
@@ -50,8 +52,9 @@ export const IMAGES = {
   eduAiGamma: eduAiGammaImg,
   eduAiPerplexity: eduAiPerplexityImg,
   eduAiNotebooklm: eduAiNotebooklmImg,
-  rutaIntegracion: rutaIaFuturisticaImg,
+  rutaIntegracion: rutaIaColoresPaginaImg,
   gammaDeclaracionPreview: gammaDeclaracionIaImg,
+  labCocreacionNatural: labCocreacionNaturalImg,
 };
 
 export const UDIFY_AGENT_URL = 'https://udify.app/agent/KH1A0kd7SiOVb6kW';

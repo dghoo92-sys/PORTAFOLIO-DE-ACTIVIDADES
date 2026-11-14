@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
   ArrowLeft,
@@ -17,6 +17,7 @@ import {
   Sparkles,
   Users,
   Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { Navbar } from './components/Navbar';
 import {
@@ -97,6 +98,75 @@ export default function App() {
   const [selectedDocument, setSelectedDocument] = useState<EthicsDocument | null>(null);
 
   const [activeAiCategory, setActiveAiCategory] = useState<string>('Todas');
+
+  const introVideoRef = useRef<HTMLDivElement | null>(null);
+  const introIframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [introVideoActive, setIntroVideoActive] = useState(false);
+  const [introVideoMuted, setIntroVideoMuted] = useState(true);
+
+  useEffect(() => {
+    if (isStandaloneMuro || typeof window === 'undefined') return;
+    const target = introVideoRef.current;
+    if (!target) return;
+
+    const sendCommand = (func: string) => {
+      try {
+        introIframeRef.current?.contentWindow?.postMessage(
+          JSON.stringify({ event: 'command', func, args: [] }),
+          'https://www.youtube.com'
+        );
+      } catch {
+        // ignore cross-origin postMessage errors
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIntroVideoActive((prev) => {
+              if (prev) {
+                sendCommand('playVideo');
+              }
+              return true;
+            });
+          } else {
+            sendCommand('pauseVideo');
+          }
+        });
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [isStandaloneMuro]);
+
+  const toggleIntroVideoMute = () => {
+    const nextMuted = !introVideoMuted;
+    setIntroVideoMuted(nextMuted);
+    try {
+      const win = introIframeRef.current?.contentWindow;
+      if (win) {
+        win.postMessage(
+          JSON.stringify({
+            event: 'command',
+            func: nextMuted ? 'mute' : 'unMute',
+            args: [],
+          }),
+          'https://www.youtube.com'
+        );
+        if (!nextMuted) {
+          win.postMessage(
+            JSON.stringify({ event: 'command', func: 'playVideo', args: [] }),
+            'https://www.youtube.com'
+          );
+        }
+      }
+    } catch {
+      // ignore postMessage errors
+    }
+  };
 
   const {
     milestones,
@@ -182,98 +252,71 @@ export default function App() {
           />
 
           <div className="relative z-10 max-w-[1140px] mx-auto px-5 sm:px-8 space-y-14">
-            {/* PANTALLA FUTURISTA DE BIENVENIDA */}
+            {/* PORTADA NATURAL: LABORATORIO DE CO-CREACIÓN CON I.A. */}
             <motion.div
-              initial={prefersReduced ? false : { opacity: 0, y: 20, scale: 0.985 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative rounded-[2.25rem] p-[2px] bg-gradient-to-r from-[#F57923] via-[#EC4899] via-[#8B5CF6] to-[#06B6D4] shadow-2xl shadow-[#3E3028]/20"
+              initial={prefersReduced ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="relative rounded-[2.25rem] bg-[#FAF7F0] border border-[#F7C99D] p-6 sm:p-10 lg:p-12 shadow-lg shadow-[#3E3028]/8 overflow-hidden"
             >
-              <div className="relative overflow-hidden rounded-[2.15rem] bg-gradient-to-br from-[#161124] via-[#221738] to-[#131C31] px-6 py-10 sm:px-12 sm:py-14 text-center">
-                {/* Fondo cuadriculado futurista y destellos de color */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 opacity-20"
-                  style={{
-                    backgroundImage:
-                      'linear-gradient(to right, rgba(56, 189, 248, 0.28) 1px, transparent 1px), linear-gradient(to bottom, rgba(245, 121, 35, 0.25) 1px, transparent 1px)',
-                    backgroundSize: '42px 42px',
-                  }}
-                />
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -top-24 -left-16 w-72 h-72 rounded-full bg-[#F57923]/30 blur-3xl"
-                />
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -bottom-24 -right-12 w-80 h-80 rounded-full bg-[#06B6D4]/25 blur-3xl"
-                />
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-44 rounded-full bg-[#EC4899]/20 blur-3xl"
-                />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#FFF0DE] blur-2xl"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-24 -right-16 w-80 h-80 rounded-full bg-[#F7C99D]/30 blur-3xl"
+              />
 
-                {/* Esquinas luminosas tipo visor futurista */}
-                <span aria-hidden="true" className="pointer-events-none absolute top-5 left-5 w-6 h-6 border-t-2 border-l-2 border-[#22D3EE]/75 rounded-tl-lg" />
-                <span aria-hidden="true" className="pointer-events-none absolute top-5 right-5 w-6 h-6 border-t-2 border-r-2 border-[#F57923]/80 rounded-tr-lg" />
-                <span aria-hidden="true" className="pointer-events-none absolute bottom-5 left-5 w-6 h-6 border-b-2 border-l-2 border-[#F472B6]/75 rounded-bl-lg" />
-                <span aria-hidden="true" className="pointer-events-none absolute bottom-5 right-5 w-6 h-6 border-b-2 border-r-2 border-[#A78BFA]/75 rounded-br-lg" />
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+                {/* Columna de texto y accesos */}
+                <div className="lg:col-span-6 space-y-5 text-center lg:text-left">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-[#FFF0DE] border border-[#F7C99D] px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[#F57923]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#F57923]" />
+                    Portafolio Digital Interactivo
+                  </span>
 
-                <div className="relative z-10 max-w-4xl mx-auto space-y-6">
-                  {/* Barra superior decorativa de pantalla */}
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-[#FDE68A]">
-                      <Sparkles className="w-4 h-4 text-[#22D3EE]" />
-                      Portafolio Digital Interactivo
-                    </span>
-                  </div>
-
-                  <h1 className="font-serif text-[clamp(2.2rem,5vw,4.05rem)] font-extrabold leading-[1.08] tracking-tight">
-                    <span className="block text-[#FAF7F0] drop-shadow-[0_2px_18px_rgba(255,255,255,0.18)]">
-                      ¡Bienvenidos al aula del futuro
-                    </span>
-                    <span className="block mt-1 bg-gradient-to-r from-[#FF8A3D] via-[#FF5E99] via-[#C084FC] to-[#22D3EE] bg-clip-text text-transparent drop-shadow-[0_4px_24px_rgba(236,72,153,0.28)]">
-                      con Inteligencia Artificial!
+                  <h1 className="font-serif text-[clamp(2rem,4.1vw,3.35rem)] font-bold leading-[1.08] tracking-tight text-[#3E3028]">
+                    LABORATORIO DE{' '}
+                    <span className="relative inline-block text-[#F57923]">
+                      CO-CREACIÓN CON I.A.
+                      <HandDrawnUnderline className="absolute -bottom-2 left-0 w-full h-3.5" />
                     </span>
                   </h1>
 
-                  <p className="text-base sm:text-lg text-[#EDE9FE]/90 leading-relaxed max-w-[66ch] mx-auto">
-                    Descubre una experiencia interactiva donde la pedagogía humana y la tecnología avanzada se unen en cuatro etapas vivas: diagnóstico, co-creación, ética y herramientas de IA para potenciar el aprendizaje.
+                  <p className="text-sm sm:text-base text-[#6C584C] leading-relaxed max-w-[56ch] mx-auto lg:mx-0">
+                    Un espacio cercano y colaborativo donde el criterio humano y la tecnología trabajan juntos en cuatro etapas vivas: diagnóstico, co-creación didáctica, ética y herramientas de inteligencia artificial para el aula.
                   </p>
 
-                  {/* Módulos de colores estilo pantalla */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-3xl mx-auto pt-1">
-                    {[
-                      { label: '01 · Diagnóstico', href: '#diagnostico', border: 'border-[#F57923]/55 hover:bg-[#F57923]/20 text-[#FDBA74]' },
-                      { label: '02 · Co-creación', href: '#co-creacion', border: 'border-[#EC4899]/55 hover:bg-[#EC4899]/20 text-[#F9A8D4]' },
-                      { label: '03 · Ética IA', href: '#etica', border: 'border-[#A855F7]/55 hover:bg-[#A855F7]/20 text-[#D8B4FE]' },
-                      { label: '04 · Herramientas', href: '#agente-ia', border: 'border-[#06B6D4]/55 hover:bg-[#06B6D4]/20 text-[#67E8F9]' },
-                    ].map((chip) => (
-                      <a
-                        key={chip.label}
-                        href={chip.href}
-                        className={`rounded-2xl bg-white/6 backdrop-blur-xs border ${chip.border} px-3 py-2.5 text-xs sm:text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5`}
-                      >
-                        {chip.label}
-                      </a>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-2">
                     <a
                       href="#intro-contenido"
-                      className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] hover:brightness-110 text-white font-bold text-sm sm:text-base px-7 py-3.5 shadow-lg shadow-[#EC4899]/30 transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#F57923] hover:bg-[#DF6613] text-[#FAF7F0] font-semibold text-sm sm:text-base px-6 py-3 shadow-md shadow-[#F57923]/20 transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
                     >
                       <span>Explorar introducción</span>
                       <ArrowRight className="w-4 h-4" />
                     </a>
                     <a
                       href="#contacto"
-                      className="inline-flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/18 text-[#FAF7F0] border border-[#22D3EE]/45 font-semibold text-sm sm:text-base px-6 py-3.5 backdrop-blur-xs transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#FFF0DE] hover:bg-[#F7C99D]/55 text-[#3E3028] border border-[#F7C99D] font-semibold text-sm sm:text-base px-6 py-3 transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
                     >
-                      <Bot className="w-4 h-4 text-[#22D3EE]" />
+                      <Bot className="w-4 h-4 text-[#F57923]" />
                       <span>Ir al Agente virtual</span>
                     </a>
+                  </div>
+                </div>
+
+                {/* Fotografía natural cálida acorde al portafolio */}
+                <div className="lg:col-span-6">
+                  <div className="relative rounded-[1.85rem] p-2 bg-[#FFF0DE] border border-[#F7C99D] shadow-md shadow-[#3E3028]/8">
+                    <div className="overflow-hidden rounded-[1.45rem] aspect-[16/10] bg-[#FAF7F0]">
+                      <ResilientImage
+                        src={IMAGES.labCocreacionNatural}
+                        alt="Docentes colaborando de forma natural alrededor de una mesa de trabajo en el Laboratorio de Co-creación con Inteligencia Artificial"
+                        className="w-full h-full object-cover"
+                        containerClassName="w-full h-full"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -295,38 +338,61 @@ export default function App() {
               <div className="overflow-hidden rounded-3xl border border-[#F7C99D] bg-[#FAF7F0] shadow-md shadow-[#3E3028]/8">
                 <img
                   src={IMAGES.rutaIntegracion}
-                  alt="Ruta futurista e interactiva de integración de la inteligencia artificial en la docencia: diagnóstico, cocreación didáctica, análisis ético y agentes multimodales"
+                  alt="Ruta de Integración de la Inteligencia Artificial en la Docencia: Fase 1 diagnóstico de necesidades iniciales, Fase 2 laboratorios de cocreación didáctica, análisis ético y código de conducta, y agentes multimodales y declaración final"
                   referrerPolicy="no-referrer"
                   className="w-full h-auto block mx-auto"
                 />
               </div>
             </div>
 
-            {/* Video trasladado debajo de Introducción de la actividad */}
-            <div className="pt-4 max-w-3xl mx-auto text-left">
+            {/* Video anclado debajo de Introducción de la actividad con reproducción automática al llegar */}
+            <div ref={introVideoRef} className="pt-4 max-w-3xl mx-auto text-left">
               <div className="rounded-[2rem] bg-[#FAF7F0] border border-[#F7C99D] p-4 sm:p-5 space-y-3 shadow-sm">
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs font-semibold text-[#F57923]">
                     Video · Diagnóstico en el aula
                   </p>
-                  <a
-                    href="https://www.youtube.com/watch?v=Mhv2Cz-Omik"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#3E3028] hover:text-[#F57923] transition-colors"
-                  >
-                    Ver en YouTube
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={toggleIntroVideoMute}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF0DE] hover:bg-[#F7C99D]/55 text-[#3E3028] border border-[#F7C99D] text-xs font-semibold px-3 py-1 transition-colors cursor-pointer"
+                    >
+                      {introVideoMuted ? (
+                        <>
+                          <VolumeX className="w-3.5 h-3.5 text-[#F57923]" />
+                          Activar sonido
+                        </>
+                      ) : (
+                        <>
+                          <Volume2 className="w-3.5 h-3.5 text-[#F57923]" />
+                          Silenciar
+                        </>
+                      )}
+                    </button>
+                    <a
+                      href="https://www.youtube.com/watch?v=Mhv2Cz-Omik"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#3E3028] hover:text-[#F57923] transition-colors"
+                    >
+                      Ver en YouTube
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
                 </div>
                 <div className="overflow-hidden rounded-2xl border border-[#3E3028]/10 bg-[#3E3028] aspect-video">
                   <iframe
-                    src="https://www.youtube.com/embed/Mhv2Cz-Omik?rel=0"
+                    ref={introIframeRef}
+                    src={
+                      introVideoActive
+                        ? 'https://www.youtube.com/embed/Mhv2Cz-Omik?autoplay=1&mute=1&playsinline=1&enablejsapi=1&rel=0'
+                        : 'https://www.youtube.com/embed/Mhv2Cz-Omik?mute=1&playsinline=1&enablejsapi=1&rel=0'
+                    }
                     title="Video del apartado de Diagnóstico"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin"
                     allowFullScreen
-                    loading="lazy"
                     className="w-full h-full border-0"
                   />
                 </div>
@@ -752,20 +818,20 @@ export default function App() {
                   </button>
                 </div>
 
-                {/* Presentación interactiva integrada en el apartado */}
-                <div className="rounded-2xl bg-[#FFF0DE] border border-[#F7C99D] p-4 sm:p-5 space-y-4">
-                  <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-[#3E3028]/10">
-                    <span className="text-xs font-semibold text-[#F57923] tabular-nums">
+                {/* Presentación interactiva integrada en el apartado con colores vívidos */}
+                <div className="rounded-2xl bg-gradient-to-br from-[#FFFDF7] via-[#FFF1DB] to-[#E0F2FE]/80 border-2 border-[#F57923]/55 p-4 sm:p-5 shadow-lg shadow-[#F57923]/12 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-gradient-to-r from-[#F57923] via-[#F97316] to-[#0EA5E9] px-3.5 py-2.5 text-white shadow-xs">
+                    <span className="text-xs font-extrabold text-white tabular-nums">
                       Diapositiva {activity2Slide} de 9
                     </span>
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => setActivity2Slide(2)}
-                        className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-colors cursor-pointer ${
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                           activity2Slide === 2
-                            ? 'bg-[#3E3028] text-[#FAF7F0]'
-                            : 'bg-[#FAF7F0] text-[#3E3028] hover:bg-[#F7C99D]/55'
+                            ? 'bg-[#FEF08A] text-[#3E3028] shadow-xs'
+                            : 'bg-white/90 text-[#3E3028] hover:bg-white'
                         }`}
                       >
                         Menú
@@ -776,27 +842,27 @@ export default function App() {
                   {activity2Slide === 1 && (
                     <div className="py-2 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
                       <div className="md:col-span-6 space-y-3 text-center md:text-left">
-                        <h4 className="font-serif text-xl sm:text-2xl font-bold text-[#3E3028]">
+                        <h4 className="font-serif text-xl sm:text-2xl font-bold text-[#1E1B4B]">
                           Actividad 2: Mapa mental y reto con IA
                         </h4>
-                        <p className="text-xs sm:text-sm text-[#6C584C] max-w-md mx-auto md:mx-0 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-[#4B3B32] max-w-md mx-auto md:mx-0 leading-relaxed">
                           Presentación interactiva. Haz clic en empezar o elige un paso para avanzar.
                         </p>
                         <button
                           type="button"
                           onClick={() => setActivity2Slide(2)}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-[#F57923] hover:bg-[#DF6613] text-[#FAF7F0] text-xs font-semibold px-5 py-2.5 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] hover:brightness-110 text-white text-xs font-bold px-5 py-2.5 shadow-md transition-all cursor-pointer"
                         >
                           Empezar
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
                       <div className="md:col-span-6">
-                        <div className="overflow-hidden rounded-2xl border border-[#3E3028]/10 bg-[#FAF7F0] aspect-[4/3] shadow-xs">
+                        <div className="overflow-hidden rounded-2xl border-2 border-[#0EA5E9]/45 ring-2 ring-[#F57923]/20 bg-white aspect-[4/3] shadow-md">
                           <ResilientImage
                             src={IMAGES.cocreationWorkshop}
                             alt="Docentes co-creando en taller colaborativo con mapas mentales e inteligencia artificial"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover saturate-[1.12]"
                             containerClassName="w-full h-full"
                           />
                         </div>
@@ -806,7 +872,7 @@ export default function App() {
 
                   {activity2Slide === 2 && (
                     <div className="space-y-3">
-                      <h4 className="font-serif text-base sm:text-lg font-bold text-[#3E3028]">
+                      <h4 className="font-serif text-base sm:text-lg font-bold text-[#1E1B4B]">
                         Menú: elige un paso
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -817,19 +883,37 @@ export default function App() {
                           { label: '4. Abre tu reto', target: 6, stepIndex: 3, qrHref: MURO_QR_RETOS_URL },
                           { label: '5. Resuelve el reto con IA', target: 7, stepIndex: 4, qrHref: null },
                           { label: '6. Sube el resultado final', target: 8, stepIndex: 5, qrHref: null },
-                        ].map((item) => {
+                        ].map((item, idx) => {
                           const stepData = ACTIVITY_2_STEPS[item.stepIndex];
+                          const stepCardThemes = [
+                            'bg-[#FFF0E0] hover:bg-[#FFE2C4] border-[#F57923]/55',
+                            'bg-[#ECFDF5] hover:bg-[#D1FAE5] border-[#10B981]/55',
+                            'bg-[#EFF6FF] hover:bg-[#DBEAFE] border-[#3B82F6]/55',
+                            'bg-[#F5F3FF] hover:bg-[#EDE9FE] border-[#8B5CF6]/55',
+                            'bg-[#FFF1F2] hover:bg-[#FFE4E6] border-[#F43F5E]/55',
+                            'bg-[#FEFCE8] hover:bg-[#FEF08A]/70 border-[#EAB308]/60',
+                          ];
+                          const arrowColors = [
+                            'text-[#EA580C]',
+                            'text-[#059669]',
+                            'text-[#2563EB]',
+                            'text-[#7C3AED]',
+                            'text-[#E11D48]',
+                            'text-[#CA8A04]',
+                          ];
                           return (
                             <div
                               key={item.target}
-                              className="rounded-xl bg-[#FAF7F0] hover:bg-[#F7C99D]/45 border border-[#3E3028]/10 transition-colors flex items-center justify-between gap-2 pr-2.5"
+                              className={`rounded-xl border-2 transition-all flex items-center justify-between gap-2 pr-2.5 shadow-2xs ${
+                                stepCardThemes[idx % stepCardThemes.length]
+                              }`}
                             >
                               <button
                                 type="button"
                                 onClick={() => setActivity2Slide(item.target)}
-                                className="flex-1 min-w-0 text-left p-2.5 text-xs font-semibold text-[#3E3028] flex items-center gap-2.5 cursor-pointer"
+                                className="flex-1 min-w-0 text-left p-2.5 text-xs font-bold text-[#1E1B4B] flex items-center gap-2.5 cursor-pointer"
                               >
-                                <div className="w-12 h-9 rounded-lg overflow-hidden border border-[#3E3028]/10 bg-[#FFF0DE] shrink-0">
+                                <div className="w-12 h-9 rounded-lg overflow-hidden border border-white/80 bg-white shadow-2xs shrink-0">
                                   <ResilientImage
                                     src={stepData.image}
                                     alt={stepData.imageAlt}
@@ -844,7 +928,7 @@ export default function App() {
                                   href={item.qrHref}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-full bg-[#FFF0DE] hover:bg-[#F57923] text-[#F57923] hover:text-[#FAF7F0] border border-[#F57923]/30 px-2 py-0.5 text-[11px] font-bold transition-colors shrink-0"
+                                  className="inline-flex items-center gap-1 rounded-full bg-[#0EA5E9] hover:bg-[#0284C7] text-white px-2.5 py-0.5 text-[11px] font-bold transition-colors shrink-0 shadow-2xs"
                                 >
                                   QR
                                   <ExternalLink className="w-2.5 h-2.5" />
@@ -854,7 +938,7 @@ export default function App() {
                                 type="button"
                                 onClick={() => setActivity2Slide(item.target)}
                                 aria-label={`Ir a ${item.label}`}
-                                className="text-[#F57923] shrink-0 cursor-pointer"
+                                className={`${arrowColors[idx % arrowColors.length]} shrink-0 cursor-pointer`}
                               >
                                 <ArrowRight className="w-3.5 h-3.5" />
                               </button>
@@ -878,13 +962,13 @@ export default function App() {
                         return (
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5 items-center">
                             <div className="md:col-span-6 space-y-2.5">
-                              <span className="text-xs font-semibold text-[#F57923] block">
+                              <span className="inline-block rounded-full bg-gradient-to-r from-[#F57923] to-[#EC4899] text-white px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider shadow-2xs">
                                 {current.stepLabel} de 6
                               </span>
-                              <h4 className="font-serif text-lg sm:text-xl font-bold text-[#3E3028]">
+                              <h4 className="font-serif text-lg sm:text-xl font-bold text-[#1E1B4B]">
                                 {current.title}
                               </h4>
-                              <p className="text-xs sm:text-sm text-[#6C584C] leading-relaxed">
+                              <p className="text-xs sm:text-sm text-[#4B3B32] leading-relaxed">
                                 {bodyParts.map((part, idx) =>
                                   part === 'QR' ? (
                                     <a
@@ -892,7 +976,7 @@ export default function App() {
                                       href={stepQrUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-0.5 font-semibold text-[#F57923] hover:text-[#DF6613] underline underline-offset-4"
+                                      className="inline-flex items-center gap-0.5 font-bold text-[#0284C7] hover:text-[#0369A1] underline underline-offset-4"
                                     >
                                       QR
                                       <ExternalLink className="w-3 h-3" />
@@ -908,7 +992,7 @@ export default function App() {
                                     href={current.link.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#F57923] hover:text-[#DF6613] underline underline-offset-4"
+                                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#EA580C] hover:text-[#C2410C] underline underline-offset-4"
                                   >
                                     {current.link.label}
                                     <ExternalLink className="w-3.5 h-3.5" />
@@ -918,7 +1002,7 @@ export default function App() {
                                   <button
                                     type="button"
                                     onClick={() => setMuroQrModalTab(stepTab)}
-                                    className="inline-flex items-center gap-1.5 rounded-full bg-[#FAF7F0] hover:bg-[#F7C99D]/55 border border-[#3E3028]/12 text-[#3E3028] text-xs font-semibold px-3 py-1 transition-colors cursor-pointer"
+                                    className="inline-flex items-center gap-1.5 rounded-full bg-[#DBEAFE] hover:bg-[#BFDBFE] border border-[#3B82F6]/45 text-[#1D4ED8] text-xs font-bold px-3.5 py-1 transition-colors cursor-pointer"
                                   >
                                     Abrir aquí
                                   </button>
@@ -926,12 +1010,12 @@ export default function App() {
                               </div>
                             </div>
                             <div className="md:col-span-6">
-                              <div className="overflow-hidden rounded-2xl border border-[#3E3028]/10 bg-[#FAF7F0] aspect-[4/3] shadow-xs">
+                              <div className="overflow-hidden rounded-2xl border-2 border-[#8B5CF6]/40 ring-2 ring-[#F57923]/15 bg-white aspect-[4/3] shadow-md">
                                 <ResilientImage
                                   key={current.image}
                                   src={current.image}
                                   alt={current.imageAlt}
-                                  className="w-full h-full object-cover"
+                                  className="w-full h-full object-cover saturate-[1.1]"
                                   containerClassName="w-full h-full"
                                 />
                               </div>
@@ -944,14 +1028,14 @@ export default function App() {
                         <button
                           type="button"
                           onClick={() => setActivity2Slide(2)}
-                          className="rounded-full bg-[#FAF7F0] hover:bg-[#F7C99D]/55 text-[#3E3028] border border-[#3E3028]/10 text-xs font-semibold px-4 py-2 transition-colors cursor-pointer"
+                          className="rounded-full bg-white hover:bg-[#FFF0DE] text-[#3E3028] border border-[#F57923]/35 text-xs font-bold px-4 py-2 transition-colors cursor-pointer"
                         >
                           Volver al menú
                         </button>
                         <button
                           type="button"
                           onClick={() => setActivity2Slide((s) => s + 1)}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-[#F57923] hover:bg-[#DF6613] text-[#FAF7F0] text-xs font-semibold px-4 py-2 transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] hover:brightness-110 text-white text-xs font-bold px-4 py-2 shadow-sm transition-all cursor-pointer"
                         >
                           {activity2Slide === 8 ? 'Terminar' : 'Siguiente paso'}
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -963,29 +1047,29 @@ export default function App() {
                   {activity2Slide === 9 && (
                     <div className="py-2 grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
                       <div className="md:col-span-7 text-center md:text-left space-y-3">
-                        <div className="w-10 h-10 mx-auto md:mx-0 rounded-full bg-[#FAF7F0] border border-[#F57923]/30 flex items-center justify-center text-[#F57923]">
+                        <div className="w-11 h-11 mx-auto md:mx-0 rounded-full bg-gradient-to-br from-[#10B981] to-[#0EA5E9] flex items-center justify-center text-white shadow-md">
                           <Check className="w-5 h-5" />
                         </div>
-                        <h4 className="font-serif text-lg sm:text-xl font-bold text-[#3E3028]">
+                        <h4 className="font-serif text-lg sm:text-xl font-bold text-[#1E1B4B]">
                           ¡Actividad completada!
                         </h4>
-                        <p className="text-xs sm:text-sm text-[#6C584C] max-w-md mx-auto md:mx-0 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-[#4B3B32] max-w-md mx-auto md:mx-0 leading-relaxed">
                           Su equipo terminó los 6 pasos. Revisen que el mapa esté en el Muro y el reto en la carpeta.
                         </p>
                         <button
                           type="button"
                           onClick={() => setActivity2Slide(2)}
-                          className="rounded-full bg-[#3E3028] hover:bg-[#3E3028]/90 text-[#FAF7F0] text-xs font-semibold px-4 py-2 transition-colors cursor-pointer"
+                          className="rounded-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] hover:brightness-110 text-white text-xs font-bold px-4 py-2 shadow-sm transition-all cursor-pointer"
                         >
                           Volver al menú
                         </button>
                       </div>
                       <div className="md:col-span-5">
-                        <div className="overflow-hidden rounded-2xl border border-[#3E3028]/10 bg-[#FAF7F0] aspect-[4/3] shadow-xs">
+                        <div className="overflow-hidden rounded-2xl border-2 border-[#10B981]/50 bg-white aspect-[4/3] shadow-md">
                           <ResilientImage
                             src={IMAGES.step6UploadFinal}
                             alt="Producto final entregado y verificado en la carpeta del reto"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover saturate-[1.1]"
                             containerClassName="w-full h-full"
                           />
                         </div>
@@ -994,17 +1078,17 @@ export default function App() {
                   )}
 
                   {/* Navegador rápido de diapositivas 1–9 */}
-                  <div className="flex items-center justify-center gap-1.5 pt-2 border-t border-[#3E3028]/10">
+                  <div className="flex items-center justify-center gap-1.5 pt-2.5 border-t border-[#F57923]/25">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                       <button
                         key={num}
                         type="button"
                         onClick={() => setActivity2Slide(num)}
                         aria-label={`Ir a diapositiva ${num}`}
-                        className={`w-6 h-6 rounded-full text-[11px] font-semibold tabular-nums transition-colors cursor-pointer ${
+                        className={`w-6 h-6 rounded-full text-[11px] font-bold tabular-nums transition-all cursor-pointer ${
                           activity2Slide === num
-                            ? 'bg-[#F57923] text-[#FAF7F0]'
-                            : 'bg-[#FAF7F0] text-[#6C584C] hover:text-[#3E3028]'
+                            ? 'bg-gradient-to-r from-[#F57923] to-[#EC4899] text-white shadow-xs'
+                            : 'bg-white text-[#6C584C] hover:text-[#3E3028] border border-[#F57923]/25'
                         }`}
                       >
                         {num}
@@ -1265,14 +1349,14 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Lado derecho: presentación interactiva con el contenido exacto del documento */}
-              <div className="lg:col-span-7 rounded-2xl bg-[#FAF7F0] border border-[#3E3028]/12 p-4 sm:p-5 shadow-xs space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-[#3E3028]/10">
+              {/* Lado derecho: presentación interactiva con colores más vívidos */}
+              <div className="lg:col-span-7 rounded-2xl bg-gradient-to-br from-[#FFFDF8] via-[#FFF3E3] to-[#FFE2C2] border-2 border-[#F57923]/60 p-4 sm:p-5 shadow-lg shadow-[#F57923]/15 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-xl bg-gradient-to-r from-[#F57923] via-[#FB923C] to-[#F59E0B] px-3.5 py-3 text-white shadow-xs">
                   <div>
-                    <p className="text-xs font-semibold text-[#F57923] tabular-nums">
+                    <p className="text-xs font-bold text-white tabular-nums">
                       Presentación del código · Diapositiva {ethicsCodeSlide} de 6
                     </p>
-                    <p className="text-[11px] text-[#6C584C]">
+                    <p className="text-[11px] text-[#FFF7ED]">
                       {ETHICS_CODE_PRESENTATION.headerSubtitle}
                     </p>
                   </div>
@@ -1289,10 +1373,10 @@ export default function App() {
                         key={tab.num}
                         type="button"
                         onClick={() => setEthicsCodeSlide(tab.num)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
                           ethicsCodeSlide === tab.num
-                            ? 'bg-[#3E3028] text-[#FAF7F0]'
-                            : 'bg-[#FFF0DE] text-[#3E3028] hover:bg-[#F7C99D]/60'
+                            ? 'bg-[#3E3028] text-[#FAF7F0] shadow-sm'
+                            : 'bg-white/90 text-[#3E3028] hover:bg-white'
                         }`}
                       >
                         {tab.label}
@@ -1305,7 +1389,7 @@ export default function App() {
                 {ethicsCodeSlide === 1 && (
                   <div className="space-y-3">
                     <div className="space-y-0.5">
-                      <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#F57923]">
+                      <span className="inline-block rounded-full bg-[#F57923]/15 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#EA580C]">
                         1 · Principios clave
                       </span>
                       <h4 className="font-serif text-lg font-bold text-[#3E3028]">
@@ -1313,15 +1397,26 @@ export default function App() {
                       </h4>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {ETHICS_CODE_PRESENTATION.principiosClave.map((item) => (
-                        <div
-                          key={item.label}
-                          className="rounded-xl bg-[#FFF0DE]/70 border border-[#F7C99D] p-3 text-xs sm:text-sm leading-snug"
-                        >
-                          <span className="font-bold text-[#3E3028]">{item.label}: </span>
-                          <span className="text-[#6C584C]">{item.text}</span>
-                        </div>
-                      ))}
+                      {ETHICS_CODE_PRESENTATION.principiosClave.map((item, idx) => {
+                        const cardThemes = [
+                          'bg-[#FFF0E0] border-[#F57923]/55 text-[#C2410C]',
+                          'bg-[#ECFDF5] border-[#10B981]/55 text-[#047857]',
+                          'bg-[#EFF6FF] border-[#3B82F6]/55 text-[#1D4ED8]',
+                          'bg-[#F5F3FF] border-[#8B5CF6]/55 text-[#6D28D9]',
+                          'bg-[#FFF1F2] border-[#F43F5E]/55 text-[#BE123C]',
+                          'bg-[#FEFCE8] border-[#EAB308]/65 text-[#A16207]',
+                        ];
+                        const theme = cardThemes[idx % cardThemes.length];
+                        return (
+                          <div
+                            key={item.label}
+                            className={`rounded-xl border-2 p-3 text-xs sm:text-sm leading-snug shadow-2xs ${theme}`}
+                          >
+                            <span className="font-extrabold">{item.label}: </span>
+                            <span className="text-[#3E3028] font-medium">{item.text}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -1330,43 +1425,43 @@ export default function App() {
                 {ethicsCodeSlide === 2 && (
                   <div className="space-y-3">
                     <div className="space-y-0.5">
-                      <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#F57923]">
+                      <span className="inline-block rounded-full bg-[#1D4ED8]/15 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#1D4ED8]">
                         2 · Badges de declaración de uso esperado de IA
                       </span>
-                      <p className="text-xs text-[#6C584C]">
+                      <p className="text-xs font-medium text-[#6C584C]">
                         {ETHICS_CODE_PRESENTATION.badgesIntro}
                       </p>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {ETHICS_CODE_PRESENTATION.badges.map((badge) => {
                         const statusStyles = {
-                          teal: 'bg-[#0F766E] text-white',
-                          blue: 'bg-[#1D4ED8] text-white',
+                          teal: 'bg-[#0D9488] text-white',
+                          blue: 'bg-[#2563EB] text-white',
                           amber: 'bg-[#D97706] text-white',
-                          red: 'bg-[#DC2626] text-white',
+                          red: 'bg-[#E11D48] text-white',
                         }[badge.accent];
-                        const cardBorder = {
-                          teal: 'border-[#0F766E]/35',
-                          blue: 'border-[#1D4ED8]/35',
-                          amber: 'border-[#D97706]/40',
-                          red: 'border-[#DC2626]/35',
+                        const cardSurface = {
+                          teal: 'bg-[#CCFBF1]/70 border-[#0D9488]/60',
+                          blue: 'bg-[#DBEAFE]/75 border-[#2563EB]/60',
+                          amber: 'bg-[#FEF3C7]/85 border-[#D97706]/65',
+                          red: 'bg-[#FFE4E6]/80 border-[#E11D48]/60',
                         }[badge.accent];
                         return (
                           <div
                             key={badge.num}
-                            className={`rounded-xl bg-white border ${cardBorder} p-3 flex flex-col justify-between gap-2`}
+                            className={`rounded-xl border-2 ${cardSurface} p-3 flex flex-col justify-between gap-2 shadow-2xs`}
                           >
                             <div className="space-y-1">
                               <div className="flex items-center justify-between gap-2">
-                                <span className="text-[11px] font-bold text-[#3E3028] tabular-nums">
+                                <span className="text-[11px] font-extrabold text-[#3E3028] tabular-nums">
                                   {badge.num} · {badge.name}
                                 </span>
                                 <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${statusStyles}`}>
                                   {badge.status}
                                 </span>
                               </div>
-                              <p className="text-xs font-semibold text-[#3E3028]">{badge.subtitle}</p>
-                              <p className="text-[11px] text-[#6C584C] leading-relaxed">
+                              <p className="text-xs font-bold text-[#3E3028]">{badge.subtitle}</p>
+                              <p className="text-[11px] text-[#4B3B32] leading-relaxed">
                                 {badge.description}
                               </p>
                             </div>
@@ -1381,39 +1476,45 @@ export default function App() {
                 {ethicsCodeSlide === 3 && (
                   <div className="space-y-3">
                     <div className="space-y-0.5">
-                      <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#F57923]">
+                      <span className="inline-block rounded-full bg-[#F57923]/15 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#EA580C]">
                         Badges para declaración de uso esperado de IA
                       </span>
-                      <p className="text-xs text-[#6C584C]">
+                      <p className="text-xs font-medium text-[#6C584C]">
                         {ETHICS_CODE_PRESENTATION.badgesIntro}
                       </p>
                     </div>
-                    <div className="overflow-x-auto rounded-xl border border-[#3E3028]/12 bg-white">
+                    <div className="overflow-x-auto rounded-xl border-2 border-[#F57923]/45 bg-white shadow-xs">
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
-                          <tr className="bg-[#FFF0DE] text-[#3E3028] border-b border-[#3E3028]/10">
-                            <th className="py-2 px-3 font-bold">Badges</th>
-                            <th className="py-2 px-3 font-bold">Uso pedagógico sugerido</th>
-                            <th className="py-2 px-3 font-bold whitespace-nowrap">Estado</th>
+                          <tr className="bg-gradient-to-r from-[#F57923] to-[#F59E0B] text-white">
+                            <th className="py-2.5 px-3 font-bold">Badges</th>
+                            <th className="py-2.5 px-3 font-bold">Uso pedagógico sugerido</th>
+                            <th className="py-2.5 px-3 font-bold whitespace-nowrap">Estado</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#3E3028]/10">
                           {ETHICS_CODE_PRESENTATION.badges.map((badge) => {
                             const statusStyles = {
-                              teal: 'bg-[#0F766E] text-white',
-                              blue: 'bg-[#1D4ED8] text-white',
+                              teal: 'bg-[#0D9488] text-white',
+                              blue: 'bg-[#2563EB] text-white',
                               amber: 'bg-[#D97706] text-white',
-                              red: 'bg-[#DC2626] text-white',
+                              red: 'bg-[#E11D48] text-white',
+                            }[badge.accent];
+                            const rowTint = {
+                              teal: 'bg-[#F0FDFA]/80',
+                              blue: 'bg-[#EFF6FF]/80',
+                              amber: 'bg-[#FFFBEB]/85',
+                              red: 'bg-[#FFF1F2]/80',
                             }[badge.accent];
                             return (
-                              <tr key={badge.num} className="align-top">
+                              <tr key={badge.num} className={`align-top ${rowTint}`}>
                                 <td className="py-2.5 px-3 font-semibold text-[#3E3028]">
-                                  <span className="block font-bold">{badge.name}</span>
-                                  <span className="text-[11px] font-normal text-[#6C584C]">
+                                  <span className="block font-extrabold">{badge.name}</span>
+                                  <span className="text-[11px] font-medium text-[#6C584C]">
                                     {badge.subtitle}
                                   </span>
                                 </td>
-                                <td className="py-2.5 px-3 text-[11px] text-[#6C584C] leading-relaxed">
+                                <td className="py-2.5 px-3 text-[11px] text-[#3E3028] leading-relaxed">
                                   {badge.description}
                                 </td>
                                 <td className="py-2.5 px-3 whitespace-nowrap">
@@ -1433,13 +1534,15 @@ export default function App() {
                 {/* Diapositiva 4: Compromisos de docentes */}
                 {ethicsCodeSlide === 4 && (
                   <div className="space-y-3">
-                    <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#F57923]">
+                    <span className="inline-block rounded-full bg-[#10B981]/18 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#047857]">
                       3 · Compromisos de docentes
                     </span>
-                    <ul className="space-y-2 rounded-xl bg-[#FFF0DE]/65 border border-[#F7C99D] p-4">
+                    <ul className="space-y-2.5 rounded-xl bg-gradient-to-br from-[#ECFDF5] to-[#D1FAE5]/75 border-2 border-[#10B981]/50 p-4">
                       {ETHICS_CODE_PRESENTATION.compromisosDocentes.map((item) => (
-                        <li key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#3E3028]">
-                          <Check className="w-4 h-4 text-[#F57923] shrink-0 mt-0.5" />
+                        <li key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#1F2937] font-medium">
+                          <span className="w-5 h-5 rounded-full bg-[#10B981] text-white flex items-center justify-center shrink-0 mt-0.5">
+                            <Check className="w-3.5 h-3.5" />
+                          </span>
                           <span className="leading-relaxed">{item}</span>
                         </li>
                       ))}
@@ -1450,13 +1553,15 @@ export default function App() {
                 {/* Diapositiva 5: Compromisos de estudiantes */}
                 {ethicsCodeSlide === 5 && (
                   <div className="space-y-3">
-                    <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#F57923]">
+                    <span className="inline-block rounded-full bg-[#3B82F6]/18 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#1D4ED8]">
                       4 · Compromisos de estudiantes
                     </span>
-                    <ul className="space-y-2 rounded-xl bg-[#FFF0DE]/65 border border-[#F7C99D] p-4">
+                    <ul className="space-y-2.5 rounded-xl bg-gradient-to-br from-[#EFF6FF] to-[#DBEAFE]/80 border-2 border-[#3B82F6]/50 p-4">
                       {ETHICS_CODE_PRESENTATION.compromisosEstudiantes.map((item) => (
-                        <li key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#3E3028]">
-                          <Check className="w-4 h-4 text-[#F57923] shrink-0 mt-0.5" />
+                        <li key={item} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#1E293B] font-medium">
+                          <span className="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center shrink-0 mt-0.5">
+                            <Check className="w-3.5 h-3.5" />
+                          </span>
                           <span className="leading-relaxed">{item}</span>
                         </li>
                       ))}
@@ -1467,36 +1572,46 @@ export default function App() {
                 {/* Diapositiva 6: Recomendaciones */}
                 {ethicsCodeSlide === 6 && (
                   <div className="space-y-3">
-                    <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#F57923]">
+                    <span className="inline-block rounded-full bg-[#8B5CF6]/18 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-[#6D28D9]">
                       5 · Recomendaciones
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {ETHICS_CODE_PRESENTATION.recomendaciones.map((item, idx) => (
-                        <div
-                          key={item}
-                          className="rounded-xl bg-[#FFF0DE]/70 border border-[#F7C99D] p-3 flex items-start gap-2.5 text-xs sm:text-sm text-[#3E3028]"
-                        >
-                          <span className="w-5 h-5 rounded-full bg-[#F57923] text-[#FAF7F0] text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5 tabular-nums">
-                            {idx + 1}
-                          </span>
-                          <span className="leading-snug">{item}</span>
-                        </div>
-                      ))}
+                      {ETHICS_CODE_PRESENTATION.recomendaciones.map((item, idx) => {
+                        const recThemes = [
+                          { box: 'bg-[#FFF0E0] border-[#F57923]/55', dot: 'bg-[#F57923]' },
+                          { box: 'bg-[#FFF1F2] border-[#F43F5E]/55', dot: 'bg-[#E11D48]' },
+                          { box: 'bg-[#F5F3FF] border-[#8B5CF6]/55', dot: 'bg-[#7C3AED]' },
+                          { box: 'bg-[#ECFDF5] border-[#10B981]/55', dot: 'bg-[#059669]' },
+                          { box: 'bg-[#FEFCE8] border-[#EAB308]/65', dot: 'bg-[#D97706]' },
+                        ];
+                        const theme = recThemes[idx % recThemes.length];
+                        return (
+                          <div
+                            key={item}
+                            className={`rounded-xl border-2 p-3 flex items-start gap-2.5 text-xs sm:text-sm font-medium text-[#3E3028] ${theme.box}`}
+                          >
+                            <span className={`w-5 h-5 rounded-full text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5 tabular-nums ${theme.dot}`}>
+                              {idx + 1}
+                            </span>
+                            <span className="leading-snug">{item}</span>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <p className="rounded-xl bg-[#3E3028] text-[#FAF7F0] px-3.5 py-2.5 text-xs font-medium leading-relaxed">
+                    <p className="rounded-xl bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] text-white px-4 py-2.5 text-xs font-semibold leading-relaxed shadow-xs">
                       {ETHICS_CODE_PRESENTATION.footerNote}
                     </p>
                   </div>
                 )}
 
                 {/* Controles de navegación de la presentación */}
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#3E3028]/10">
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#F57923]/25">
                   <button
                     type="button"
                     onClick={() => setEthicsCodeSlide((s) => (s > 1 ? s - 1 : 6))}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF0DE] hover:bg-[#F7C99D]/55 text-[#3E3028] text-xs font-semibold px-3.5 py-1.5 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-white hover:bg-[#FFF0DE] text-[#3E3028] border border-[#F57923]/35 text-xs font-bold px-3.5 py-1.5 transition-colors cursor-pointer"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <ArrowLeft className="w-3.5 h-3.5 text-[#F57923]" />
                     Anterior
                   </button>
                   <div className="flex items-center gap-1">
@@ -1506,10 +1621,10 @@ export default function App() {
                         type="button"
                         onClick={() => setEthicsCodeSlide(num)}
                         aria-label={`Ir a diapositiva ${num} del código de conducta`}
-                        className={`w-6 h-6 rounded-full text-[11px] font-semibold tabular-nums transition-colors cursor-pointer ${
+                        className={`w-6 h-6 rounded-full text-[11px] font-bold tabular-nums transition-all cursor-pointer ${
                           ethicsCodeSlide === num
-                            ? 'bg-[#F57923] text-[#FAF7F0]'
-                            : 'bg-[#FFF0DE] text-[#6C584C] hover:text-[#3E3028]'
+                            ? 'bg-gradient-to-r from-[#F57923] to-[#EC4899] text-white shadow-xs'
+                            : 'bg-white/90 text-[#6C584C] hover:text-[#3E3028] border border-[#F57923]/20'
                         }`}
                       >
                         {num}
@@ -1519,7 +1634,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setEthicsCodeSlide((s) => (s < 6 ? s + 1 : 1))}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#F57923] hover:bg-[#DF6613] text-[#FAF7F0] text-xs font-semibold px-3.5 py-1.5 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#F57923] to-[#F59E0B] hover:brightness-105 text-white text-xs font-bold px-3.5 py-1.5 shadow-xs transition-all cursor-pointer"
                   >
                     Siguiente
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -1842,9 +1957,21 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="lg:col-span-7 rounded-2xl bg-[#FAF7F0] border border-[#3E3028]/12 p-3 sm:p-4 shadow-xs space-y-2.5">
-                        <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-[#3E3028]/10">
-                          <span className="text-xs font-semibold text-[#F57923]">
+                      <div
+                        className={`lg:col-span-7 rounded-2xl space-y-2.5 ${
+                          isGamma
+                            ? 'bg-gradient-to-br from-[#FFFDF8] via-[#FFF1E0] to-[#FCE7F3] border-2 border-[#EC4899]/55 p-3.5 sm:p-4 shadow-lg shadow-[#F57923]/15'
+                            : 'bg-[#FAF7F0] border border-[#3E3028]/12 p-3 sm:p-4 shadow-xs'
+                        }`}
+                      >
+                        <div
+                          className={`flex flex-wrap items-center justify-between gap-2 ${
+                            isGamma
+                              ? 'rounded-xl bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] px-3.5 py-2.5 text-white shadow-xs'
+                              : 'pb-1.5 border-b border-[#3E3028]/10'
+                          }`}
+                        >
+                          <span className={`text-xs font-bold ${isGamma ? 'text-white' : 'text-[#F57923] font-semibold'}`}>
                             {activity.previewImage
                               ? 'Presentación Gamma · Haz clic en la imagen para abrir'
                               : isGamma
@@ -1856,7 +1983,11 @@ export default function App() {
                               href={activity.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#3E3028] hover:text-[#F57923] transition-colors"
+                              className={`inline-flex items-center gap-1 text-[11px] font-bold transition-all ${
+                                isGamma
+                                  ? 'rounded-full bg-[#FEF08A] hover:bg-[#FDE047] text-[#3E3028] px-3 py-1 shadow-2xs'
+                                  : 'text-[#3E3028] hover:text-[#F57923] font-semibold'
+                              }`}
                             >
                               Abrir en Gamma
                               <ExternalLink className="w-3 h-3" />
@@ -1878,15 +2009,27 @@ export default function App() {
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label={`Abrir presentación de Gamma: ${activity.title}`}
-                            className="group/img relative block overflow-hidden rounded-xl border border-[#3E3028]/10 bg-[#FFF0DE] aspect-video focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F57923]"
+                            className={`group/img relative block overflow-hidden rounded-xl aspect-video focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F57923] ${
+                              isGamma
+                                ? 'border-2 border-[#F57923]/65 ring-2 ring-[#EC4899]/20 bg-[#FFF0DE] shadow-md'
+                                : 'border border-[#3E3028]/10 bg-[#FFF0DE]'
+                            }`}
                           >
                             <ResilientImage
                               src={activity.previewImage}
                               alt={activity.previewImageAlt ?? activity.title}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-[1.02]"
+                              className={`w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-[1.02] ${
+                                isGamma ? 'saturate-[1.18] contrast-[1.04] brightness-[1.02]' : ''
+                              }`}
                               containerClassName="w-full h-full"
                             />
-                            <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-[#F57923] group-hover/img:bg-[#DF6613] text-[#FAF7F0] text-xs font-semibold px-3.5 py-1.5 shadow-md transition-colors">
+                            <span
+                              className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full text-xs font-bold px-3.5 py-1.5 shadow-lg transition-all ${
+                                isGamma
+                                  ? 'bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] group-hover/img:brightness-110 text-white ring-2 ring-white/80'
+                                  : 'bg-[#F57923] group-hover/img:bg-[#DF6613] text-[#FAF7F0] font-semibold shadow-md'
+                              }`}
+                            >
                               Explorar en Gamma
                               <ExternalLink className="w-3.5 h-3.5" />
                             </span>
@@ -2358,8 +2501,10 @@ export default function App() {
       {/* QUIET EDITORIAL FOOTER */}
       <footer className="bg-[#FAF7F0] border-t border-[#3E3028]/10 py-10">
         <div className="max-w-[1260px] mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[#6C584C]">
-          <div className="flex items-center gap-3">
-            <span className="font-serif text-lg font-bold text-[#3E3028]">Savia Docente</span>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <span className="font-serif text-base sm:text-lg font-bold text-[#3E3028]">
+              Laboratorio de co-creación con IA
+            </span>
             <span aria-hidden="true">·</span>
             <span>Pedagogía, ética y co-creación en el aula</span>
           </div>
