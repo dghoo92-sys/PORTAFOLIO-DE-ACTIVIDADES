@@ -652,8 +652,7 @@ export const PORTFOLIO_USED_TOOLS: PortfolioUsedTool[] = [
     stage: 'Herramientas IA para clase',
     stageHref: '#agente-ia',
     url: 'https://chatgpt.com',
-    usedFor:
-      'Diseñar secuencias didácticas, redactar rúbricas formativas, formular preguntas socráticas y adaptar lecturas a distintos niveles.',
+    usedFor: 'Investigar y creación de imágenes.',
   },
   {
     id: 'used-gemini',
@@ -662,8 +661,7 @@ export const PORTFOLIO_USED_TOOLS: PortfolioUsedTool[] = [
     stage: 'Herramientas IA para clase',
     stageHref: '#agente-ia',
     url: 'https://gemini.google.com',
-    usedFor:
-      'Sintetizar textos largos, crear cuestionarios, analizar imágenes educativas y generar materiales conectados con Google Workspace.',
+    usedFor: 'Investigar y creación de imágenes.',
   },
   {
     id: 'used-notebooklm',
@@ -784,6 +782,36 @@ export const PORTFOLIO_USED_TOOLS: PortfolioUsedTool[] = [
     url: 'https://padlet.com/dghoo92/mi-declaracion-de-ia-s0253cr36w4umpx003wi',
     usedFor:
       'Recopilar y socializar en murales colaborativos las declaraciones individuales y grupales sobre el uso transparente de la IA.',
+  },
+  {
+    id: 'used-github',
+    number: '15',
+    name: 'GitHub',
+    stage: 'Repositorio web · Portafolio',
+    stageHref: '#introduccion',
+    url: 'https://github.com',
+    usedFor:
+      'Alojar y gestionar el repositorio web del portafolio de actividades con control de versiones.',
+  },
+  {
+    id: 'used-vercel',
+    number: '16',
+    name: 'Vercel',
+    stage: 'Repositorio web · Portafolio',
+    stageHref: '#introduccion',
+    url: 'https://vercel.com',
+    usedFor:
+      'Publicar y desplegar en línea el repositorio web del portafolio de actividades.',
+  },
+  {
+    id: 'used-aistudio',
+    number: '17',
+    name: 'AI Studio',
+    stage: 'Repositorio web · Portafolio',
+    stageHref: '#introduccion',
+    url: 'https://aistudio.google.com',
+    usedFor:
+      'Creación y desarrollo asistido del sitio y repositorio web del portafolio de actividades.',
   },
 ];
 

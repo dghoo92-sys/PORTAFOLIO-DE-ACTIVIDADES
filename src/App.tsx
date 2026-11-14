@@ -2654,11 +2654,11 @@ export default function App() {
                 Inventario de herramientas
                 <HandDrawnUnderline className="absolute bottom-0 left-0 w-full h-3" />
               </p>
-              <h2 className="font-serif text-[clamp(1.85rem,3vw,2.65rem)] font-bold leading-tight text-[#3E3028]">
-                Todas las herramientas de IA usadas en el portafolio y para qué
+              <h2 className="font-serif text-[clamp(1.85rem,3vw,2.65rem)] font-bold leading-tight text-[#3E3028] uppercase tracking-wide">
+                DECLARACIÓN DE USO DE IA
               </h2>
               <p className="text-sm sm:text-base text-[#6C584C] leading-relaxed">
-                Resumen completo de cada plataforma empleada a lo largo de las actividades, la etapa donde se utilizó y su propósito pedagógico.
+                Para la elaboración de este trabajo se utilizaron los siguientes asistentes y herramientas de IA como apoyo, con el propósito de desarrollar adecuadamente el portafolio y sus actividades. Todas las herramientas encontradas dentro del portafolio son hechas o adaptadas de nuestro material, donde se contrastan y se editan para lograr el resultado final.
               </p>
             </div>
 
