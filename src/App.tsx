@@ -67,6 +67,12 @@ export default function App() {
 
   const [activity2Open, setActivity2Open] = useState(false);
   const [activity2Slide, setActivity2Slide] = useState(1);
+  const [activity4Slide, setActivity4Slide] = useState(1);
+  const [customActivity4Media, setCustomActivity4Media] = useState<
+    | { kind: 'pdf'; url: string; name: string }
+    | { kind: 'images'; urls: string[]; index: number }
+    | null
+  >(null);
   const [ethicsCodeSlide, setEthicsCodeSlide] = useState(1);
   const [canvaSlideIndex, setCanvaSlideIndex] = useState(0);
   const [canvaViewMode, setCanvaViewMode] = useState<'embed' | 'images'>('embed');
@@ -1959,41 +1965,71 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div
-                        className={`lg:col-span-7 rounded-2xl space-y-2.5 ${
-                          isGamma
-                            ? 'bg-gradient-to-br from-[#FFFDF8] via-[#FFF1E0] to-[#FCE7F3] border-2 border-[#EC4899]/55 p-3.5 sm:p-4 shadow-lg shadow-[#F57923]/15'
-                            : 'bg-[#FAF7F0] border border-[#3E3028]/12 p-3 sm:p-4 shadow-xs'
-                        }`}
-                      >
-                        <div
-                          className={`flex flex-wrap items-center justify-between gap-2 ${
-                            isGamma
-                              ? 'rounded-xl bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] px-3.5 py-2.5 text-white shadow-xs'
-                              : 'pb-1.5 border-b border-[#3E3028]/10'
-                          }`}
-                        >
-                          <span className={`text-xs font-bold ${isGamma ? 'text-white' : 'text-[#F57923] font-semibold'}`}>
-                            {activity.previewImage
-                              ? 'Presentación Gamma · Haz clic en la imagen para abrir'
-                              : isGamma
-                                ? 'Presentación Gamma · Explora sin salir de la página'
-                                : 'Genially interactivo · Explora sin salir de la página'}
+                      <div className="lg:col-span-7 rounded-2xl bg-[#FAF7F0] border border-[#3E3028]/12 p-3 sm:p-4 shadow-xs space-y-2.5">
+                        <div className="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-[#3E3028]/10">
+                          <span className="text-xs font-semibold text-[#F57923]">
+                            {isGamma
+                              ? customActivity4Media?.kind === 'pdf'
+                                ? `Presentación · ${customActivity4Media.name}`
+                                : customActivity4Media?.kind === 'images'
+                                  ? `Presentación · Diapositiva ${customActivity4Media.index + 1} de ${customActivity4Media.urls.length}`
+                                  : `Presentación · Diapositiva ${activity4Slide} de 6`
+                              : 'Genially interactivo · Explora sin salir de la página'}
                           </span>
-                          {activity.previewImage ? (
-                            <a
-                              href={activity.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`inline-flex items-center gap-1 text-[11px] font-bold transition-all ${
-                                isGamma
-                                  ? 'rounded-full bg-[#FEF08A] hover:bg-[#FDE047] text-[#3E3028] px-3 py-1 shadow-2xs'
-                                  : 'text-[#3E3028] hover:text-[#F57923] font-semibold'
-                              }`}
-                            >
-                              Abrir en Gamma
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
+                          {isGamma ? (
+                            <div className="flex flex-wrap items-center gap-2">
+                              <label className="inline-flex items-center gap-1 rounded-full bg-[#FFF0DE] hover:bg-[#F7C99D]/55 text-[#3E3028] border border-[#3E3028]/12 text-[11px] font-semibold px-2.5 py-0.5 transition-colors cursor-pointer">
+                                <ImagePlus className="w-3 h-3 text-[#F57923]" />
+                                <span>Cargar PDF / diapositivas</span>
+                                <input
+                                  type="file"
+                                  accept=".pdf,application/pdf,image/*"
+                                  multiple
+                                  className="sr-only"
+                                  onChange={(e) => {
+                                    const files = Array.from(e.target.files ?? []);
+                                    if (files.length === 0) return;
+                                    const pdfFile = files.find(
+                                      (f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+                                    );
+                                    if (pdfFile) {
+                                      setCustomActivity4Media({
+                                        kind: 'pdf',
+                                        url: URL.createObjectURL(pdfFile),
+                                        name: pdfFile.name,
+                                      });
+                                    } else {
+                                      const imageFiles = files.filter((f) => f.type.startsWith('image/'));
+                                      if (imageFiles.length > 0) {
+                                        setCustomActivity4Media({
+                                          kind: 'images',
+                                          urls: imageFiles.map((f) => URL.createObjectURL(f)),
+                                          index: 0,
+                                        });
+                                      }
+                                    }
+                                  }}
+                                />
+                              </label>
+                              {customActivity4Media && (
+                                <button
+                                  type="button"
+                                  onClick={() => setCustomActivity4Media(null)}
+                                  className="text-[11px] font-semibold text-[#6C584C] hover:text-[#3E3028] underline underline-offset-2 cursor-pointer"
+                                >
+                                  Ver texto
+                                </button>
+                              )}
+                              <a
+                                href={activity.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#3E3028] hover:text-[#F57923] transition-colors"
+                              >
+                                Abrir en Gamma
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </div>
                           ) : (
                             <button
                               type="button"
@@ -2005,37 +2041,422 @@ export default function App() {
                             </button>
                           )}
                         </div>
-                        {activity.previewImage ? (
-                          <a
-                            href={activity.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label={`Abrir presentación de Gamma: ${activity.title}`}
-                            className={`group/img relative block overflow-hidden rounded-xl aspect-video focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F57923] ${
-                              isGamma
-                                ? 'border-2 border-[#F57923]/65 ring-2 ring-[#EC4899]/20 bg-[#FFF0DE] shadow-md'
-                                : 'border border-[#3E3028]/10 bg-[#FFF0DE]'
-                            }`}
-                          >
-                            <ResilientImage
-                              src={activity.previewImage}
-                              alt={activity.previewImageAlt ?? activity.title}
-                              className={`w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-[1.02] ${
-                                isGamma ? 'saturate-[1.18] contrast-[1.04] brightness-[1.02]' : ''
-                              }`}
-                              containerClassName="w-full h-full"
-                            />
-                            <span
-                              className={`absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full text-xs font-bold px-3.5 py-1.5 shadow-lg transition-all ${
-                                isGamma
-                                  ? 'bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] group-hover/img:brightness-110 text-white ring-2 ring-white/80'
-                                  : 'bg-[#F57923] group-hover/img:bg-[#DF6613] text-[#FAF7F0] font-semibold shadow-md'
-                              }`}
-                            >
-                              Explorar en Gamma
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </span>
-                          </a>
+
+                        {isGamma ? (
+                          customActivity4Media?.kind === 'pdf' ? (
+                            <div className="overflow-hidden rounded-xl border border-[#3E3028]/10 bg-white aspect-[16/10] min-h-[380px]">
+                              <iframe
+                                src={customActivity4Media.url}
+                                title={customActivity4Media.name}
+                                className="w-full h-full border-0"
+                              />
+                            </div>
+                          ) : customActivity4Media?.kind === 'images' ? (
+                            <div className="space-y-2.5">
+                              <div className="overflow-hidden rounded-xl border border-[#3E3028]/10 bg-white aspect-video">
+                                <img
+                                  src={customActivity4Media.urls[customActivity4Media.index]}
+                                  alt={`Diapositiva ${customActivity4Media.index + 1} de Actividad 4`}
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+                              <div className="flex items-center justify-between gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setCustomActivity4Media((prev) =>
+                                      prev?.kind === 'images'
+                                        ? {
+                                            ...prev,
+                                            index: prev.index > 0 ? prev.index - 1 : prev.urls.length - 1,
+                                          }
+                                        : prev
+                                    )
+                                  }
+                                  className="inline-flex items-center gap-1.5 rounded-full bg-white hover:bg-[#FFF0DE] text-[#3E3028] border border-[#3E3028]/15 text-xs font-semibold px-3.5 py-1.5 transition-colors cursor-pointer"
+                                >
+                                  <ArrowLeft className="w-3.5 h-3.5" />
+                                  Anterior
+                                </button>
+                                <span className="text-xs font-semibold text-[#6C584C] tabular-nums">
+                                  {customActivity4Media.index + 1} / {customActivity4Media.urls.length}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setCustomActivity4Media((prev) =>
+                                      prev?.kind === 'images'
+                                        ? {
+                                            ...prev,
+                                            index: prev.index < prev.urls.length - 1 ? prev.index + 1 : 0,
+                                          }
+                                        : prev
+                                    )
+                                  }
+                                  className="inline-flex items-center gap-1.5 rounded-full bg-[#3E3028] hover:bg-[#3E3028]/90 text-white text-xs font-semibold px-3.5 py-1.5 transition-colors cursor-pointer"
+                                >
+                                  Siguiente
+                                  <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2.5">
+                              {/* Diapositiva 1 */}
+                              {activity4Slide === 1 && (
+                                <div className="rounded-xl bg-white border border-[#3E3028]/12 p-4 sm:p-5 space-y-3 text-[#3E3028]">
+                                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                    <span>ACTIVIDAD 4</span>
+                                    <span>1</span>
+                                  </div>
+                                  <h4 className="font-serif text-lg sm:text-xl font-bold leading-snug">
+                                    ELABORAR UNA DECLARACIÓN DE USO DE IA
+                                  </h4>
+                                  <p className="text-xs font-semibold text-[#6C584C]">
+                                    Taller · Propuesta, revisión y acuerdo
+                                  </p>
+                                  <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-3 space-y-1">
+                                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                      PUNTO DE PARTIDA
+                                    </p>
+                                    <p className="text-sm font-bold">
+                                      ¿Quién decide las reglas de la IA?
+                                    </p>
+                                    <p className="text-xs text-[#6C584C] leading-relaxed">
+                                      Explorar qué ocurre cuando dejamos que la IA proponga las reglas que orientan su propio uso.
+                                    </p>
+                                  </div>
+                                  <div className="space-y-1 text-xs">
+                                    <p className="font-bold">VAMOS A EXPLORAR:</p>
+                                    <p className="text-[#6C584C]">
+                                      Una propuesta se vuelve común cuando el grupo puede revisarla.
+                                    </p>
+                                    <button
+                                      type="button"
+                                      onClick={() => setActivity4Slide(2)}
+                                      className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-[#3E3028] hover:bg-[#3E3028]/90 text-white text-[11px] font-semibold px-3.5 py-1.5 transition-colors cursor-pointer"
+                                    >
+                                      Empezar
+                                      <ArrowRight className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Diapositiva 2 */}
+                              {activity4Slide === 2 && (
+                                <div className="rounded-xl bg-white border border-[#3E3028]/12 p-4 sm:p-5 space-y-3 text-[#3E3028]">
+                                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                    <span>ACTIVIDAD 4 · ELABORAR UNA DECLARACIÓN DE USO DE IA</span>
+                                    <span>2</span>
+                                  </div>
+                                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                    LA PREGUNTA · SITUACIÓN INICIAL · ABRIMOS EL TALLER
+                                  </p>
+                                  <h4 className="font-serif text-lg sm:text-xl font-bold leading-snug">
+                                    ¿Qué pasaría si dejáramos que la IA creara la declaración de uso de IA?
+                                  </h4>
+                                  <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-3 space-y-1 text-xs">
+                                    <p className="font-bold uppercase tracking-wider text-[11px]">
+                                      PARTICIPACIÓN RÁPIDA · Mentimeter
+                                    </p>
+                                    <p className="text-[#6C584C] leading-relaxed">
+                                      Responder, mirar los patrones y comentarlos después. Vamos a verificar conocimientos y a explorar algunas ideas. La primera respuesta abre una conversación, no la cierra.
+                                    </p>
+                                    <a
+                                      href="https://www.menti.com/aldnujp6wks4"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1 font-semibold text-[#3E3028] underline underline-offset-4 pt-0.5"
+                                    >
+                                      Mentimeter
+                                      <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                  </div>
+                                  <p className="text-xs font-semibold">
+                                    La meta no es aceptar la primera respuesta de la IA, sino aprender a cuestionarla y mejorarla.
+                                  </p>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2.5 space-y-0.5">
+                                      <p className="font-bold">Partir de la situación</p>
+                                      <p className="text-[#6C584C]">
+                                        Discutir confianza, límites, responsabilidad y toma de decisiones.
+                                      </p>
+                                    </div>
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2.5 space-y-0.5">
+                                      <p className="font-bold">Mirar dos veces</p>
+                                      <p className="text-[#6C584C]">
+                                        Preguntar qué falta, qué puede ser injusto y qué decisiones no debería tomar la IA por el grupo.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Diapositiva 3 */}
+                              {activity4Slide === 3 && (
+                                <div className="rounded-xl bg-white border border-[#3E3028]/12 p-4 sm:p-5 space-y-3 text-[#3E3028]">
+                                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                    <span>ACTIVIDAD 4 · ELABORAR UNA DECLARACIÓN DE USO DE IA</span>
+                                    <span>3</span>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <p className="text-xs font-bold">
+                                      LLUVIA DE IDEAS : DA CLICK EN EL SIGUIENTE ENLACE O ESCANEA EL CÓDIGO QR
+                                    </p>
+                                    <p className="text-xs text-[#6C584C] leading-relaxed">
+                                      Los estudiantes construyen una lluvia de ideas sobre los principios, límites y responsabilidades que debería incluir la declaración.
+                                    </p>
+                                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                                      <a
+                                        href="https://ideamap.ai/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-xs font-bold underline underline-offset-4"
+                                      >
+                                        IDEAMAP.AI
+                                        <ExternalLink className="w-3 h-3" />
+                                      </a>
+                                    </div>
+                                  </div>
+                                  <p className="text-xs text-[#6C584C]">
+                                    La lluvia de ideas sirve para ampliar la mirada antes de redactar el acuerdo. Seguimos las siguientes instruciones.
+                                  </p>
+                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2.5">
+                                      <strong className="block">Entrar</strong>
+                                      <span className="text-[#6C584C]">Entrar a IDEAMAP.AI y generar la lluvia de ideas.</span>
+                                    </div>
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2.5">
+                                      <strong className="block">Descargar</strong>
+                                      <span className="text-[#6C584C]">Descargarla como imagen.</span>
+                                    </div>
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2.5">
+                                      <strong className="block">Revisar en grupo</strong>
+                                      <span className="text-[#6C584C]">Identificar ideas repetidas, ausencias, contradicciones y propuestas que conviene agregar.</span>
+                                    </div>
+                                  </div>
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2">
+                                      <strong className="block">Repetidas</strong>
+                                      <span className="text-[#6C584C]">¿Qué ideas aparecen varias veces?</span>
+                                    </div>
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2">
+                                      <strong className="block">Ausentes</strong>
+                                      <span className="text-[#6C584C]">¿Qué falta todavía?</span>
+                                    </div>
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2">
+                                      <strong className="block">Contradictorias</strong>
+                                      <span className="text-[#6C584C]">¿Qué contradicciones aparecen?</span>
+                                    </div>
+                                    <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2">
+                                      <strong className="block">P agregar</strong>
+                                      <span className="text-[#6C584C]">sube el mapa de ideas al siguiente link. </span>
+                                      <a
+                                        href="https://drive.google.com/drive/folders/1BJd5Zl8v_zZUpbv5rGHUqCkRD4yjSK6J?usp=sharing"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-semibold underline underline-offset-2 inline-flex items-center gap-0.5"
+                                      >
+                                        Abrir enlace
+                                        <ExternalLink className="w-2.5 h-2.5" />
+                                      </a>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Diapositiva 4 */}
+                              {activity4Slide === 4 && (
+                                <div className="rounded-xl bg-white border border-[#3E3028]/12 p-4 sm:p-5 space-y-3 text-[#3E3028]">
+                                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                    <span>ACTIVIDAD 4 · ELABORAR UNA DECLARACIÓN DE USO DE IA</span>
+                                    <span>4</span>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <p className="text-xs font-bold">_LABORATORIO DE MEJORA · Para profes</p>
+                                    <p className="text-xs text-[#6C584C] leading-relaxed">
+                                      Una declaración preparada por el tutor se convierte en material de trabajo. Mejorar una declaración exige leerla como si fuera a usarse de verdad.
+                                    </p>
+                                    <p className="text-xs font-bold pt-0.5">
+                                      ¿Cuándo está suficientemente elaborada? · Creo mi versión de declaración de IA
+                                    </p>
+                                  </div>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                    {[
+                                      {
+                                        num: '1',
+                                        title: 'Cuestionar',
+                                        desc: 'Cuestionar ideas demasiado generales o ambiguas.',
+                                      },
+                                      {
+                                        num: '2',
+                                        title: 'Reescribir',
+                                        desc: 'Reescribir principios para que sean claros, aplicables y verificables.',
+                                      },
+                                      {
+                                        num: '3',
+                                        title: 'Detectar vacíos',
+                                        desc: 'Revisar privacidad, sesgos, autoría, transparencia, revisión humana y uso responsable.',
+                                      },
+                                      {
+                                        num: '4',
+                                        title: 'Comparar y decidir',
+                                        desc: 'Comparar versiones y decidir cuándo la declaración ya está suficientemente elaborada.',
+                                      },
+                                    ].map((step) => (
+                                      <div key={step.num} className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-2.5 space-y-0.5">
+                                        <p className="font-bold">
+                                          {step.num} · {step.title}
+                                        </p>
+                                        <p className="text-[#6C584C] leading-snug">{step.desc}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Diapositiva 5 */}
+                              {activity4Slide === 5 && (
+                                <div className="rounded-xl bg-white border border-[#3E3028]/12 p-4 sm:p-5 space-y-3 text-[#3E3028]">
+                                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                    <span>ACTIVIDAD 4 · ELABORAR UNA DECLARACIÓN DE USO DE IA</span>
+                                    <span>5</span>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                      HERRAMIENTA DE REVISIÓN
+                                    </p>
+                                    <h4 className="font-serif text-base sm:text-lg font-bold">
+                                      Prompts para revisar la declaración
+                                    </h4>
+                                    <p className="text-xs text-[#6C584C] leading-relaxed">
+                                      Usar preguntas concretas para convertir una respuesta general en una propuesta que se pueda aplicar y revisar. Pon tu declaración de IA y dale prompts a la IA que decidas utilizar de manera clara y questionada para obtener una mejor versión. Se puede usar la pagina para prompts{' '}
+                                      <a
+                                        href="https://www.promptcowboy.ai/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-semibold text-[#3E3028] underline underline-offset-2 inline-flex items-center gap-0.5"
+                                      >
+                                        https://www.promptcowboy.ai/
+                                        <ExternalLink className="w-2.5 h-2.5" />
+                                      </a>
+                                    </p>
+                                  </div>
+                                  <div className="space-y-1.5 text-xs">
+                                    {[
+                                      {
+                                        num: '01',
+                                        tag: 'CUESTIONAR',
+                                        prompt: '“Cuestiona esta declaración: ¿qué ideas son ambiguas, incompletas o difíciles de aplicar?”',
+                                      },
+                                      {
+                                        num: '02',
+                                        tag: 'ACLARAR',
+                                        prompt: '“Reescribe este principio con un lenguaje claro para estudiantes y profes.”',
+                                      },
+                                      {
+                                        num: '03',
+                                        tag: 'CONCRETAR',
+                                        prompt: '“Propón una versión más concreta, con acciones observables y responsables definidos.”',
+                                      },
+                                      {
+                                        num: '04',
+                                        tag: 'AMPLIAR',
+                                        prompt: '“¿Qué riesgos del uso de IA no aparecen todavía? Explica por qué deberían incluirse.”',
+                                      },
+                                      {
+                                        num: '05',
+                                        tag: 'COMPARAR',
+                                        prompt: '“Compara estas dos versiones y recomienda cuál es más equilibrada, justificando cada cambio.”',
+                                      },
+                                    ].map((item) => (
+                                      <div key={item.num} className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 px-3 py-2">
+                                        <strong className="mr-1.5">
+                                          {item.num} · {item.tag}:
+                                        </strong>
+                                        <span className="text-[#6C584C]">{item.prompt}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Diapositiva 6 */}
+                              {activity4Slide === 6 && (
+                                <div className="rounded-xl bg-white border border-[#3E3028]/12 p-4 sm:p-5 space-y-3 text-[#3E3028]">
+                                  <div className="flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                    <span>ACTIVIDAD 4 · ELABORAR UNA DECLARACIÓN DE USO DE IA</span>
+                                    <span>6</span>
+                                  </div>
+                                  <p className="text-[11px] font-bold uppercase tracking-wider text-[#6C584C]">
+                                    CIERRE · DE LA PROPUESTA AL ACUERDO
+                                  </p>
+                                  <h4 className="font-serif text-base sm:text-lg font-bold">
+                                    Una declaración que el grupo pueda usar
+                                  </h4>
+                                  <p className="text-xs text-[#6C584C] leading-relaxed">
+                                    Compartir las mejoras, justificar las decisiones y consolidar una declaración de uso de IA que el grupo pueda comprender, revisar y aplicar.
+                                  </p>
+                                  <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-3 space-y-1 text-xs">
+                                    <p className="font-bold">PRODUCTO FINAL · DECLARACIÓN REVISADA POR EL GRUPO</p>
+                                    <p className="text-[#6C584C] leading-relaxed">
+                                      Una versión común, construida a partir de propuestas, preguntas y decisiones justificadas. Se discutira en grupos pequeños las mejores opciones y despues esas se discutirar y se eligiran solo una para establecer como declaración ideal.
+                                    </p>
+                                  </div>
+                                  <div className="rounded-lg bg-[#FAF7F0] border border-[#3E3028]/10 p-3 space-y-1 text-xs">
+                                    <p className="font-bold">PREGUNTA DE SALIDA</p>
+                                    <p className="font-medium">
+                                      ¿Qué parte de la declaración cambiaría si nuestra experiencia con la IA evoluciona?
+                                    </p>
+                                    <p className="text-[#6C584C]">
+                                      Comprender, revisar y aplicar: el acuerdo sigue abierto a la experiencia.
+                                    </p>
+                                  </div>
+                                  <p className="text-[11px] font-bold text-center text-[#6C584C] pt-0.5">
+                                    COMPARTIR LAS MEJORAS · JUSTIFICAR LAS DECISIONES · CONSOLIDAR LA DECLARACIÓN
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* Navegación entre diapositivas 1–6 */}
+                              <div className="flex items-center justify-between gap-2 pt-0.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setActivity4Slide((s) => (s > 1 ? s - 1 : 6))}
+                                  className="inline-flex items-center gap-1.5 rounded-full bg-white hover:bg-[#FFF0DE] text-[#3E3028] border border-[#3E3028]/15 text-xs font-semibold px-3.5 py-1.5 transition-colors cursor-pointer"
+                                >
+                                  <ArrowLeft className="w-3.5 h-3.5" />
+                                  Anterior
+                                </button>
+                                <div className="flex items-center gap-1">
+                                  {[1, 2, 3, 4, 5, 6].map((num) => (
+                                    <button
+                                      key={num}
+                                      type="button"
+                                      onClick={() => setActivity4Slide(num)}
+                                      aria-label={`Ir a diapositiva ${num} de Actividad 4`}
+                                      className={`w-6 h-6 rounded-full text-[11px] font-semibold tabular-nums transition-colors cursor-pointer ${
+                                        activity4Slide === num
+                                          ? 'bg-[#3E3028] text-white'
+                                          : 'bg-white text-[#6C584C] hover:text-[#3E3028] border border-[#3E3028]/15'
+                                      }`}
+                                    >
+                                      {num}
+                                    </button>
+                                  ))}
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setActivity4Slide((s) => (s < 6 ? s + 1 : 1))}
+                                  className="inline-flex items-center gap-1.5 rounded-full bg-[#3E3028] hover:bg-[#3E3028]/90 text-white text-xs font-semibold px-3.5 py-1.5 transition-colors cursor-pointer"
+                                >
+                                  Siguiente
+                                  <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          )
                         ) : (
                           <div className="overflow-hidden rounded-xl border border-[#3E3028]/10 bg-[#FFF0DE] aspect-video">
                             <iframe
