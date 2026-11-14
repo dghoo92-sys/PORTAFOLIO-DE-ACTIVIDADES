@@ -252,68 +252,68 @@ export default function App() {
           />
 
           <div className="relative z-10 max-w-[1140px] mx-auto px-5 sm:px-8 space-y-14">
-            {/* PORTADA NATURAL: LABORATORIO DE CO-CREACIÓN CON I.A. */}
+            {/* PORTADA DE BIENVENIDA: BIENVENIDO AL LABORATORIO DE COCREACIÓN CON IA */}
             <motion.div
               initial={prefersReduced ? false : { opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              className="relative rounded-[2.25rem] bg-[#FAF7F0] border border-[#F7C99D] p-6 sm:p-10 lg:p-12 shadow-lg shadow-[#3E3028]/8 overflow-hidden"
+              className="relative rounded-[2.25rem] bg-gradient-to-br from-[#FFF8EE] via-[#FFE6C7] to-[#E0F2FE] border-2 border-[#F57923]/65 p-6 sm:p-10 lg:p-12 shadow-xl shadow-[#F57923]/15 overflow-hidden"
             >
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-[#FFF0DE] blur-2xl"
+                className="pointer-events-none absolute -top-24 -left-24 w-72 h-72 rounded-full bg-gradient-to-br from-[#FB923C]/45 to-[#EC4899]/30 blur-2xl"
               />
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute -bottom-24 -right-16 w-80 h-80 rounded-full bg-[#F7C99D]/30 blur-3xl"
+                className="pointer-events-none absolute -bottom-24 -right-16 w-80 h-80 rounded-full bg-gradient-to-tr from-[#38BDF8]/40 via-[#8B5CF6]/30 to-[#FACC15]/35 blur-3xl"
               />
 
               <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
                 {/* Columna de texto y accesos */}
                 <div className="lg:col-span-6 space-y-5 text-center lg:text-left">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-[#FFF0DE] border border-[#F7C99D] px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[#F57923]">
-                    <Sparkles className="w-3.5 h-3.5 text-[#F57923]" />
+                  <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-sm">
+                    <Sparkles className="w-3.5 h-3.5 text-[#FEF08A]" />
                     Portafolio Digital Interactivo
                   </span>
 
-                  <h1 className="font-serif text-[clamp(2rem,4.1vw,3.35rem)] font-bold leading-[1.08] tracking-tight text-[#3E3028]">
-                    LABORATORIO DE{' '}
-                    <span className="relative inline-block text-[#F57923]">
-                      CO-CREACIÓN CON I.A.
+                  <h1 className="font-serif text-[clamp(2rem,4vw,3.25rem)] font-bold leading-[1.08] tracking-tight text-[#1E1B4B]">
+                    Bienvenido al{' '}
+                    <span className="relative inline-block bg-gradient-to-r from-[#EA580C] via-[#DB2777] to-[#7C3AED] bg-clip-text text-transparent">
+                      laboratorio de cocreación con IA
                       <HandDrawnUnderline className="absolute -bottom-2 left-0 w-full h-3.5" />
                     </span>
                   </h1>
 
-                  <p className="text-sm sm:text-base text-[#6C584C] leading-relaxed max-w-[56ch] mx-auto lg:mx-0">
+                  <p className="text-sm sm:text-base text-[#332924] leading-relaxed max-w-[56ch] mx-auto lg:mx-0">
                     Un espacio cercano y colaborativo donde el criterio humano y la tecnología trabajan juntos en cuatro etapas vivas: diagnóstico, co-creación didáctica, ética y herramientas de inteligencia artificial para el aula.
                   </p>
 
                   <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-2">
                     <a
                       href="#intro-contenido"
-                      className="inline-flex items-center gap-2 rounded-full bg-[#F57923] hover:bg-[#DF6613] text-[#FAF7F0] font-semibold text-sm sm:text-base px-6 py-3 shadow-md shadow-[#F57923]/20 transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
+                      className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#F57923] via-[#EC4899] to-[#8B5CF6] hover:brightness-110 text-white font-bold text-sm sm:text-base px-6 py-3 shadow-lg shadow-[#EC4899]/25 transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
                     >
                       <span>Explorar introducción</span>
                       <ArrowRight className="w-4 h-4" />
                     </a>
                     <a
                       href="#contacto"
-                      className="inline-flex items-center gap-2 rounded-full bg-[#FFF0DE] hover:bg-[#F7C99D]/55 text-[#3E3028] border border-[#F7C99D] font-semibold text-sm sm:text-base px-6 py-3 transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
+                      className="inline-flex items-center gap-2 rounded-full bg-white/95 hover:bg-[#E0F2FE] text-[#1E3A8A] border-2 border-[#0EA5E9]/55 font-bold text-sm sm:text-base px-6 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 whitespace-nowrap"
                     >
-                      <Bot className="w-4 h-4 text-[#F57923]" />
+                      <Bot className="w-4 h-4 text-[#0284C7]" />
                       <span>Ir al Agente virtual</span>
                     </a>
                   </div>
                 </div>
 
-                {/* Fotografía natural cálida acorde al portafolio */}
+                {/* Fotografía con marco en colores vivos */}
                 <div className="lg:col-span-6">
-                  <div className="relative rounded-[1.85rem] p-2 bg-[#FFF0DE] border border-[#F7C99D] shadow-md shadow-[#3E3028]/8">
-                    <div className="overflow-hidden rounded-[1.45rem] aspect-[16/10] bg-[#FAF7F0]">
+                  <div className="relative rounded-[1.85rem] p-2 bg-gradient-to-br from-[#F57923] via-[#EC4899] to-[#0EA5E9] shadow-xl shadow-[#7C3AED]/15">
+                    <div className="overflow-hidden rounded-[1.45rem] aspect-[16/10] bg-white">
                       <ResilientImage
                         src={IMAGES.labCocreacionNatural}
                         alt="Docentes colaborando de forma natural alrededor de una mesa de trabajo en el Laboratorio de Co-creación con Inteligencia Artificial"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover saturate-[1.12]"
                         containerClassName="w-full h-full"
                       />
                     </div>
@@ -335,13 +335,15 @@ export default function App() {
               Esta ruta guía la integración de la inteligencia artificial en la práctica docente a través de cuatro etapas fundamentadas: inicia con un diagnóstico inicial para identificar las necesidades y brechas tecnológicas del cuerpo docente mediante el análisis cuantitativo y cualitativo de encuestas; continúa con laboratorios de cocreación didáctica orientados al diseño práctico de recursos visuales y juegos educativos con herramientas como Canva IA y Wordwall; incorpora un análisis ético y código de conducta centrado en la evaluación de casos reales sobre privacidad y plagio para construir acuerdos institucionales claros; y finaliza con la exploración de agentes multimodales y la declaración final, consolidando un marco institucional colaborativo para el uso responsable y formalizado de IA.
             </p>
             <div className="pt-3 max-w-4xl mx-auto">
-              <div className="overflow-hidden rounded-3xl border border-[#F7C99D] bg-[#FAF7F0] shadow-md shadow-[#3E3028]/8">
-                <img
-                  src={IMAGES.rutaIntegracion}
-                  alt="Ruta de Integración de la Inteligencia Artificial en la Docencia: Fase 1 diagnóstico de necesidades iniciales, Fase 2 laboratorios de cocreación didáctica, análisis ético y código de conducta, y agentes multimodales y declaración final"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-auto block mx-auto"
-                />
+              <div className="rounded-[1.85rem] p-2 bg-gradient-to-br from-[#F57923] via-[#EC4899] to-[#0EA5E9] shadow-xl shadow-[#7C3AED]/15">
+                <div className="overflow-hidden rounded-[1.45rem] bg-white">
+                  <img
+                    src={IMAGES.rutaIntegracion}
+                    alt="Ruta de Integración de la Inteligencia Artificial en la Docencia: Fase 1 diagnóstico de necesidades iniciales, Fase 2 laboratorios de cocreación didáctica, análisis ético y código de conducta, y agentes multimodales y declaración final"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-auto block mx-auto saturate-[1.08]"
+                  />
+                </div>
               </div>
             </div>
 

@@ -25,7 +25,7 @@ import eduAiNotebooklmImg from '../assets/images/edu_ai_notebooklm_1794610153374
 import rutaIaFuturisticaImg from '../assets/images/ruta_ia_futuristica_savia_1794610340669.jpg';
 import gammaDeclaracionIaImg from '../assets/images/gamma_declaracion_ia_1794618096696.jpg';
 import labCocreacionNaturalImg from '../assets/images/lab_cocreacion_natural_1794669530676.jpg';
-import rutaIaColoresPaginaImg from '../assets/images/ruta_ia_colores_pagina_1794669690736.jpg';
+import rutaIaVivosColoresImg from '../assets/images/ruta_ia_vivos_colores_1794683947543.jpg';
 
 export const IMAGES = {
   heroTeacher: heroTeacherImg,
@@ -52,7 +52,7 @@ export const IMAGES = {
   eduAiGamma: eduAiGammaImg,
   eduAiPerplexity: eduAiPerplexityImg,
   eduAiNotebooklm: eduAiNotebooklmImg,
-  rutaIntegracion: rutaIaColoresPaginaImg,
+  rutaIntegracion: rutaIaVivosColoresImg,
   gammaDeclaracionPreview: gammaDeclaracionIaImg,
   labCocreacionNatural: labCocreacionNaturalImg,
 };
